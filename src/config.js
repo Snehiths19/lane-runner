@@ -1,7 +1,7 @@
 // Default tuning values. The on-screen panel edits a live copy of these,
 // so every number here can be changed while playing.
 export const DEFAULTS = {
-  runSpeed: 12,         // world units per second
+  runSpeed: 20,         // world units per second
   laneWidth: 2.5,       // distance between lane centres
   laneSwitchTime: 0.12, // seconds to move one lane
   jumpHeight: 2.2,      // peak height of a jump

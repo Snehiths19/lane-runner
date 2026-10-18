@@ -23,7 +23,7 @@ Node 24 `node:test` + `node:assert/strict`.
 - No Subway Surfers assets or name in the game.
 - Phone layout = viewport width < 700px; otherwise PC layout.
 - Movement and world time advance only in state `running`.
-- Defaults: runSpeed 12, laneWidth 2.5, laneSwitchTime 0.12, jumpHeight 2.2, gravity 45,
+- Defaults: runSpeed 20, laneWidth 2.5, laneSwitchTime 0.12, jumpHeight 2.2, gravity 45,
   slideTime 0.6, fastFallSpeed 30. Swipe threshold 30px.
 - Storage key `lane-runner.tuning`; all storage access wrapped so blocked storage never breaks the game.
 - Lanes are 0 (left), 1 (middle), 2 (right); lane x = `(lane - 1) * laneWidth`.
