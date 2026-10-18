@@ -89,3 +89,70 @@ html, body {
   background: var(--panel-bg);
   font-size: 15px;
 }
+
+/* Tuning panel: side bar on wide screens, bottom sheet over the game on phones. */
+#panel {
+  width: 300px;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--panel-bg);
+  border-left: 1px solid var(--line);
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+#panel[hidden] { display: none; }
+#panel h2 { margin: 0 0 12px; font-size: 18px; }
+
+.tune-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 8px;
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+.tune-label { color: var(--muted); }
+.tune-row output { font-variant-numeric: tabular-nums; font-weight: 600; }
+.tune-row input { grid-column: 1 / -1; width: 100%; accent-color: var(--accent); }
+
+.tune-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.tune-buttons button {
+  flex: 1 1 auto;
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.tune-buttons .done { background: var(--accent); border-color: var(--accent); color: #1a0d00; font-weight: 700; }
+
+.copy-fallback {
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: #000;
+  color: var(--ink);
+  font: 12px ui-monospace, monospace;
+}
+.copy-fallback[hidden] { display: none; }
+
+@media (max-width: 699px) {
+  #panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    max-height: 70dvh;
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    border-radius: 16px 16px 0 0;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
