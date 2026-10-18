@@ -12,5 +12,6 @@ and makes gameplay/design decisions. Present those decisions as plain-language c
 
 ## Workflow
 - GitHub repo `Snehiths19/lane-runner` (public) is the cloud copy; GitHub Pages hosts the game.
-- Work is built in small steps (see README roadmap); commit and push after each verified step so Snehith can continue from claude.ai/code on any device.
+- Work is built in small steps (see README roadmap). **Push to GitHub after every commit** (not just at the end of a step), so Snehith can continue from claude.ai/code on any device.
+- Design docs live in `docs/superpowers/specs/`, implementation plans in `docs/superpowers/plans/`. Plan first, then build with TDD.
 - Verify changes by running the game in a browser (screenshots) before claiming a step is done.
