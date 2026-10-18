@@ -1,0 +1,91 @@
+:root {
+  --bg: #0f1720;
+  --ink: #f4f6f8;
+  --muted: #b7c2cc;
+  --panel-bg: rgba(15, 23, 32, 0.94);
+  --accent: #ff7a1a;
+  --line: rgba(255, 255, 255, 0.15);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#app {
+  display: flex;
+  height: 100dvh;
+}
+
+#stage {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#hud {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  left: 16px;
+  font-size: 20px;
+  font-weight: 700;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+
+#gear {
+  position: absolute;
+  top: max(6px, env(safe-area-inset-top));
+  right: 10px;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.35);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 16px;
+  text-align: center;
+  background: rgba(10, 20, 35, 0.45);
+  cursor: pointer;
+}
+.overlay[hidden] { display: none; }
+.overlay h1 { margin: 0 0 8px; font-size: clamp(36px, 9vw, 64px); letter-spacing: 0.02em; }
+.overlay .cta { margin: 0; font-size: 20px; font-weight: 600; }
+.overlay .hint { margin: 0; color: var(--muted); font-size: 15px; }
+
+#notice {
+  position: absolute;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: var(--panel-bg);
+  font-size: 15px;
+}

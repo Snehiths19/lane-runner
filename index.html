@@ -2,14 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Lane Runner</title>
-  <style>
-    body { margin: 0; min-height: 100vh; display: grid; place-items: center;
-           font-family: system-ui, sans-serif; background: #111; color: #eee; }
-  </style>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏃</text></svg>">
+  <link rel="stylesheet" href="styles.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+  <script type="module" src="src/main.js"></script>
 </head>
 <body>
-  <p>Lane Runner — coming soon (step 1 in progress).</p>
+  <div id="app">
+    <main id="stage">
+      <canvas id="game"></canvas>
+      <div id="hud"><span id="distance">0 m</span></div>
+      <button id="gear" type="button" aria-label="Tuning" aria-expanded="false">⚙️</button>
+      <div id="start" class="overlay">
+        <h1>Lane Runner</h1>
+        <p class="cta">Tap / press Space to run</p>
+        <p class="hint">Swipe or use arrow keys to move</p>
+      </div>
+      <div id="notice" role="status" hidden></div>
+    </main>
+    <aside id="panel" aria-label="Tuning" hidden></aside>
+  </div>
 </body>
 </html>
