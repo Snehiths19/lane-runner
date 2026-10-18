@@ -9,11 +9,12 @@ test('wide screens use the base view', () => {
   assert.equal(fovForAspect(16 / 9), 60);
 });
 
-test('upright phone widens the view enough to keep all lanes', () => {
-  const aspect = 390 / 844;
-  const vfov = fovForAspect(aspect);
-  assert.ok(vfov > 60);
-  assert.ok(Math.abs(horizontalFov(vfov, aspect) - 62) < 0.01);
+test('upright phones widen the view enough to keep all lanes, without hitting the cap', () => {
+  for (const [w, h] of [[390, 844], [360, 800], [430, 932]]) {
+    const vfov = fovForAspect(w / h);
+    assert.ok(vfov > 60 && vfov < 100, `${w}x${h}: ${vfov}`);
+    assert.ok(Math.abs(horizontalFov(vfov, w / h) - 55) < 0.01, `${w}x${h}`);
+  }
 });
 
 test('extremely narrow screens are capped', () => {
