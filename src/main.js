@@ -1,8 +1,8 @@
 // Wires the pure game modules to the page and runs the animation loop.
 
 import { createWorld } from './world.js';
-import { createPlayer, handleAction, updatePlayer, bounceBack } from './player.js';
-import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score } from './game-state.js';
+import { createPlayer, handleAction, updatePlayer, bounceBack, startIntro } from './player.js';
+import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score, speedAt } from './game-state.js';
 import { attachInput } from './input.js';
 import { loadTuning, saveTuning, settingsText } from './tuning.js';
 import { buildPanel } from './panel.js';
@@ -48,8 +48,16 @@ const track = createTrack(sections, RULES.track);
 let runId = game.runId;
 let result = null; // this run's recorded score, best and top runs
 
+// Every run opens with the intro leap over an oncoming train (CONTEXT.md: Intro leap).
+function beginRun() {
+  startIntro(player, cfg, RULES.intro.leapHeight);
+  track.addIntroTrain({ runSpeed: cfg.runSpeed, gravity: cfg.gravity, leapHeight: RULES.intro.leapHeight });
+}
+
 function onAction(action) {
+  const wasStart = game.state === 'start';
   const move = routeAction(game, action);
+  if (wasStart && game.state === 'running') beginRun();
   startScreen.hidden = game.state !== 'start';
   if (move && handleAction(player, move, cfg) === 'edge') onBump(performance.now() / 1000);
 }
@@ -73,6 +81,7 @@ function newRun() {
   world.reset();
   result = null;
   crashScreen.hidden = true;
+  beginRun();
 }
 
 function showCrashScreen() {
@@ -153,13 +162,17 @@ function frame(nowMs) {
   // Rules that need world sizes as well as the slider values.
   const worldCfg = { ...cfg, roofHeight: RULES.track.roofHeight };
   const prevDistance = game.distance;
-  const runDt = advance(game, dt, cfg.runSpeed);
-  const groundY = groundHeightAt(player.x, game.distance, track.items, worldCfg);
+  const speed = speedAt(game.time, cfg.runSpeed, RULES.speedRamp);
+  const runDt = advance(game, dt, speed);
+  track.move(runDt);
+  const groundY = groundHeightAt(player.x, game.distance, track.items, worldCfg, { y: player.y, prevDistance });
   updatePlayer(player, runDt, cfg, groundY);
   if (game.state === 'running') {
-    track.fill(game.distance + 150);
+    track.fill(game.distance + 150, game.distance, speed);
     track.dropBefore(game.distance - 10);
-    const hits = checkHits(player, track.items, game.distance, worldCfg, prevDistance);
+    // Nothing can be hit during the intro leap.
+    const hits = player.intro ? { crash: false, sideBump: false, coins: [] }
+      : checkHits(player, track.items, game.distance, worldCfg, prevDistance);
     // Only a new bounce is a new bump: still touching the same train while heading back isn't.
     if (hits.sideBump && !hits.crash && bounceBack(player)) onBump(now);
     if (hits.coins.length) {
@@ -175,7 +188,7 @@ function frame(nowMs) {
     showCrashScreen();
   }
 
-  world.update(cfg.runSpeed * runDt, player, cfg, track.items, game.distance, now, groundY, dt, chase.gap);
+  world.update(speed * runDt, player, cfg, track.items, game.distance, now, groundY, dt, chase.gap);
   scoreEl.textContent = pad(score(game, RULES));
   coinsEl.textContent = String(game.coins);
   requestAnimationFrame(frame);
