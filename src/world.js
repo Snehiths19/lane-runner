@@ -57,24 +57,65 @@ function randomizeSide(side, materials) {
   }
 }
 
-// Placeholder character: a simple figure drawn on a canvas, shown as a flat cutout.
-function buildRunner() {
+// A flat cutout: a picture drawn on a canvas, standing on its bottom edge, `height` tall.
+function cutout(width, height, draw, px = 128) {
   const c = document.createElement('canvas');
-  c.width = 128;
-  c.height = 256;
-  const g = c.getContext('2d');
-  g.fillStyle = '#ff7a1a';
-  g.strokeStyle = '#3a1d00';
-  g.lineWidth = 6;
-  g.beginPath(); g.arc(64, 48, 34, 0, Math.PI * 2); g.fill(); g.stroke();
-  g.beginPath(); g.roundRect(24, 92, 80, 110, 24); g.fill(); g.stroke();
-  g.fillRect(34, 196, 22, 54); g.strokeRect(34, 196, 22, 54);
-  g.fillRect(72, 196, 22, 54); g.strokeRect(72, 196, 22, 54);
+  c.width = px;
+  c.height = Math.round((px * height) / width);
+  draw(c.getContext('2d'), c.width, c.height);
   const texture = new THREE.CanvasTexture(c);
   texture.colorSpace = THREE.SRGBColorSpace;
-  const geo = new THREE.PlaneGeometry(RUNNER_HEIGHT / 2, RUNNER_HEIGHT);
-  geo.translate(0, RUNNER_HEIGHT / 2, 0); // bottom edge on the ground
+  const geo = new THREE.PlaneGeometry(width, height);
+  geo.translate(0, height / 2, 0); // bottom edge on the ground
   return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.1 }));
+}
+
+// Placeholder character: a simple figure drawn on a canvas, shown as a flat cutout.
+function buildRunner() {
+  return cutout(RUNNER_HEIGHT / 2, RUNNER_HEIGHT, (g) => {
+    g.fillStyle = '#ff7a1a';
+    g.strokeStyle = '#3a1d00';
+    g.lineWidth = 6;
+    g.beginPath(); g.arc(64, 48, 34, 0, Math.PI * 2); g.fill(); g.stroke();
+    g.beginPath(); g.roundRect(24, 92, 80, 110, 24); g.fill(); g.stroke();
+    g.fillRect(34, 196, 22, 54); g.strokeRect(34, 196, 22, 54);
+    g.fillRect(72, 196, 22, 54); g.strokeRect(72, 196, 22, 54);
+  });
+}
+
+// Placeholder chasers (CONTEXT.md: Chasers): a tall inspector in a blue uniform and cap, and a small
+// dog. Real art comes later as skins.
+function buildInspector() {
+  return cutout(0.95, 1.9, (g) => {
+    g.strokeStyle = '#0d1b2a';
+    g.lineWidth = 6;
+    g.fillStyle = '#f1c27d'; // face
+    g.beginPath(); g.arc(64, 62, 30, 0, Math.PI * 2); g.fill(); g.stroke();
+    g.fillStyle = '#1d3557'; // cap
+    g.beginPath(); g.roundRect(30, 22, 68, 24, 8); g.fill(); g.stroke();
+    g.fillRect(24, 40, 80, 10);
+    g.beginPath(); g.roundRect(18, 98, 92, 110, 20); g.fill(); g.stroke(); // coat
+    g.fillStyle = '#f2c200'; // badge
+    g.beginPath(); g.arc(84, 124, 8, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#14213d'; // legs
+    g.fillRect(32, 200, 24, 52); g.strokeRect(32, 200, 24, 52);
+    g.fillRect(72, 200, 24, 52); g.strokeRect(72, 200, 24, 52);
+  });
+}
+
+function buildDog() {
+  return cutout(0.9, 0.7, (g) => {
+    g.strokeStyle = '#3b2412';
+    g.lineWidth = 5;
+    g.fillStyle = '#a0522d';
+    g.beginPath(); g.roundRect(18, 40, 76, 40, 16); g.fill(); g.stroke(); // body
+    g.beginPath(); g.arc(98, 36, 22, 0, Math.PI * 2); g.fill(); g.stroke(); // head
+    g.fillStyle = '#3b2412';
+    g.beginPath(); g.ellipse(88, 18, 7, 13, -0.4, 0, Math.PI * 2); g.fill(); // ear
+    g.fillStyle = '#a0522d';
+    for (const x of [24, 42, 70, 86]) { g.fillRect(x, 74, 10, 24); g.strokeRect(x, 74, 10, 24); } // legs
+    g.beginPath(); g.moveTo(20, 50); g.lineTo(4, 30); g.stroke(); // tail
+  });
 }
 
 // Placeholder looks for track items (real art comes later as skins). Built at lane width 1 and
@@ -200,6 +241,11 @@ export function createWorld(canvas) {
   shadow.position.y = 0.03;
   scene.add(shadow);
 
+  const inspector = buildInspector();
+  const dog = buildDog();
+  scene.add(inspector, dog);
+  let chaseX = 0; // the chasers follow the runner sideways a little behind
+
   const buildItem = buildItemFactory();
   const itemMeshes = new Map(); // item id -> mesh
   const itemLayer = new THREE.Group();
@@ -235,8 +281,9 @@ export function createWorld(canvas) {
   // scroll: how far the world moved this frame (0 while not running).
   // items/distance: what's on the track and how far the runner has gone; time: seconds, for coin spin.
   // groundY: surface height under the runner (track or roof); the camera follows it smoothly.
+  // chaseGap: how far behind the runner the inspector and dog are (hidden when beyond the camera).
   let cameraSurface = 0;
-  function update(scroll, player, cfg, items = [], distance = 0, time = 0, groundY = 0, dt = 0) {
+  function update(scroll, player, cfg, items = [], distance = 0, time = 0, groundY = 0, dt = 0, chaseGap = Infinity) {
     cameraSurface += (groundY - cameraSurface) * Math.min(1, dt / 0.25 * 3);
     syncItems(items, distance, cfg, time);
     if (cfg.laneWidth !== laneWidth) {
@@ -265,8 +312,17 @@ export function createWorld(canvas) {
 
     camera.position.set(player.x * 0.5, 3.6 + cameraSurface, 6);
     camera.lookAt(player.x * 0.5, 1.4 + cameraSurface, -12);
+
+    chaseX += (player.x - chaseX) * Math.min(1, dt * 6);
+    const chaseZ = knockBack + chaseGap;
+    inspector.visible = dog.visible = chaseZ < camera.position.z - 0.5;
+    inspector.position.set(chaseX - 0.55, cameraSurface, chaseZ);
+    dog.position.set(chaseX + 0.6, cameraSurface, chaseZ - 0.5);
+
     // Cutouts always face the camera, turning only around the vertical axis.
-    runner.rotation.y = Math.atan2(camera.position.x - runner.position.x, camera.position.z);
+    for (const c of [runner, inspector, dog]) {
+      c.rotation.y = Math.atan2(camera.position.x - c.position.x, camera.position.z - c.position.z);
+    }
 
     renderer.render(scene, camera);
   }

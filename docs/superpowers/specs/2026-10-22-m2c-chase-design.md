@@ -38,7 +38,7 @@ warning; a second one during the warning ends the run.
 
 ## Numbers (baseline `chase`, our calls unless 🧪)
 
-stumbleTime 3 s 🧪 (HIT-3, to measure) · startTime 2 s 🧪 (CHS-1) · closeGap 2.5 m · farGap 8 m ·
+stumbleTime 3 s 🧪 (HIT-3, to measure) · startTime 2 s 🧪 (CHS-1) · closeGap 2 m · farGap 8 m ·
 closeSpeed 8 m/s · dropSpeed 3 m/s · caughtGap 0.4 m · catchTime 0.5 s. Edge nudge: 0.3 lane widths
 over 0.25 s.
 

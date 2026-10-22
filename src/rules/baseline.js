@@ -27,7 +27,7 @@ export const BASELINE = {
   chase: {
     stumbleTime: 3,       // HIT-3 🧪 seconds a stumble lasts (second bump inside it = crash)
     startTime: 2,         // CHS-1 🧪 seconds the chasers stay close at run start
-    closeGap: 2.5,        // CHS-1 metres behind the runner when close (our call, in view)
+    closeGap: 2.0,        // CHS-1 metres behind the runner when close (our call, in view on PC and phone)
     farGap: 8,            // CHS-1 metres behind when dropped back (our call, out of view)
     closeSpeed: 8,        // CHS-1 metres per second the gap closes (our call)
     dropSpeed: 3,         // CHS-1 metres per second the gap opens (our call)
