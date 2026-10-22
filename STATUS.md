@@ -1,7 +1,8 @@
 # Status & next steps
 
 The handoff note for any new session (terminal, desktop or claude.ai project). Read this first,
-then `CLAUDE.md`, `CONTEXT.md` and `FEATURES.md`. Update it at the end of every slice.
+then `CLAUDE.md`, `CONTEXT.md`, `FEATURES.md` and `docs/HISTORY.md` (the full story: what was tried
+and rejected, how the goal evolved, every decision by session). Update this file at the end of every slice.
 
 _Last updated: 2026-10-22._
 

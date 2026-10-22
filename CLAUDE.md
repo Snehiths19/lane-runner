@@ -1,7 +1,8 @@
 # Lane Runner — Claude instructions
 
 **Start here:** read `STATUS.md` (where the project stands, the working process, and the next slice's
-agenda), then `CONTEXT.md` (glossary + invariants) and `FEATURES.md` (roadmap). Update `STATUS.md`
+agenda), then `CONTEXT.md` (glossary + invariants), `FEATURES.md` (roadmap) and `docs/HISTORY.md` (how we got
+here, rejected approaches, every decision by session). Update `STATUS.md`
 at the end of every slice.
 
 ## About the owner
