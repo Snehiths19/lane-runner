@@ -103,7 +103,10 @@ _Avoid_: death, game over (as a term; fine as on-screen copy)
 The runner's hitbox meeting an obstacle coming toward it in the runner's own lane. Always a crash.
 
 **Side bump**:
-The runner's hitbox meeting an obstacle while changing lanes into it from the side. The runner bounces back to the lane they left.
+The runner's hitbox meeting an obstacle while changing lanes into it from the side (e.g. swiping into a train they're running beside). The runner bounces back to the lane they left. From slice 2b it bounces only; the **stumble** penalty joins in slice 2c.
+
+**Roof**:
+The top of a train, a raised running surface. Leaving it (off the far end, or sideways into a lane without a train) drops the runner to the track; sideways onto a neighbouring train's roof keeps them up.
 
 **Stumble**:
 The warning state after a side bump, lasting a short window (Subway Surfers' length still to be measured); a second side bump while stumbling is a crash.
