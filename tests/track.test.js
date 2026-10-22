@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseSections } from '../src/sections.js';
 import { createTrack } from '../src/track.js';
+import { createPlayer, updatePlayer, startIntro } from '../src/player.js';
+import { DEFAULTS } from '../src/config.js';
 
 const opts = { rowLength: 5, startClear: 36, roofHeight: 3.6 };
 const SECTIONS = parseSections(`name: barrier
@@ -173,4 +175,27 @@ test('move shifts only moving trains and remembers where they were', () => {
       assert.equal(item.start, before[k]);
     }
   });
+});
+
+test('the intro train passes under the runner during the intro leap', () => {
+  for (const runSpeed of [12, 20]) {
+    const cfg = { ...DEFAULTS, runSpeed };
+    const track = createTrack(SECTIONS, movingOpts, seeded());
+    track.addIntroTrain({ runSpeed, gravity: cfg.gravity, leapHeight: 5 });
+    const [train] = track.items;
+    assert.equal(train.lane, 1);
+    const p = createPlayer();
+    startIntro(p, cfg, 5);
+    let distance = 0;
+    let passed = false;
+    for (let t = 0; t < 1.5; t += 1 / 60) {
+      updatePlayer(p, 1 / 60, cfg);
+      distance += runSpeed / 60;
+      track.move(1 / 60);
+      const under = train.start <= distance + 0.3 && train.end >= distance - 0.3;
+      if (under) assert.ok(p.y > opts.roofHeight, `speed ${runSpeed}: y ${p.y.toFixed(2)} over the train`);
+      if (train.end < distance) passed = true;
+    }
+    assert.ok(passed, `speed ${runSpeed}: the train went past`);
+  }
 });

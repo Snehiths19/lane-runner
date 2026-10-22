@@ -52,6 +52,16 @@ export function createTrack(sections, { rowLength, startClear, roofHeight, train
     items.push(...added.sort((x, y) => x.start - y.start));
   }
 
+  // The intro leap's train (CONTEXT.md: Intro leap): one car in the middle lane, timed so it passes
+  // under the runner around the top of a leapHeight jump that starts now, at distance 0.
+  function addIntroTrain({ runSpeed, gravity, leapHeight }) {
+    const length = 2 * rowLength;
+    const closing = runSpeed + trainSpeed;
+    const peakTime = Math.sqrt(2 * leapHeight / gravity);
+    const front = (peakTime - length / closing / 2) * closing;
+    items.unshift({ id: nextId++, kind: 'train', lane: 1, start: front, end: front + length, base: 0, speed: trainSpeed, prevStart: front });
+  }
+
   // Moving trains drive toward the runner.
   function move(dt) {
     for (const item of items) {
@@ -86,5 +96,5 @@ export function createTrack(sections, { rowLength, startClear, roofHeight, train
     last = null;
   }
 
-  return { items, fill, move, dropBefore, reset };
+  return { items, fill, move, addIntroTrain, dropBefore, reset };
 }

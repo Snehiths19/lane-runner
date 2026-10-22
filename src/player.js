@@ -16,6 +16,7 @@ export function createPlayer() {
     slideQueued: false, // swiped down in the air: slide as soon as we land
     nudgeDir: 0, // edge swipe: -1 left wall, 1 right wall
     nudgeT: 1, // 0..1 progress of the edge nudge (1 = done)
+    intro: false, // in the opening leap: swipes are ignored until landing
   };
 }
 
@@ -35,6 +36,7 @@ const NUDGE_TIME = 0.25;
 // action: 'left' | 'right' | 'jump' | 'slide'
 // Returns 'edge' for a swipe into the wall at the track edge (a side bump, CONTEXT.md).
 export function handleAction(p, action, cfg) {
+  if (p.intro) return;
   if (action === 'left' || action === 'right') {
     // Allowed mid-air and mid-switch, like Subway Surfers.
     const dir = action === 'left' ? -1 : 1;
@@ -62,6 +64,13 @@ export function handleAction(p, action, cfg) {
       p.slideQueued = true;
     }
   }
+}
+
+// Intro leap (CONTEXT.md): one automatic high jump that opens every run.
+export function startIntro(p, cfg, height) {
+  p.vy = jumpVelocity(height, cfg.gravity);
+  p.grounded = false;
+  p.intro = true;
 }
 
 // Side bump: head back to the lane the runner just left, from wherever they are now
@@ -108,6 +117,7 @@ export function updatePlayer(p, dt, cfg, groundY = 0) {
       p.y = groundY;
       p.vy = 0;
       p.grounded = true;
+      p.intro = false;
       if (p.slideQueued) {
         p.slideLeft = cfg.slideTime;
         p.slideQueued = false;
