@@ -127,3 +127,12 @@ test('running off the top of a ramp onto the roof is not a crash', () => {
   const train = { ...at('train', 1, 20), start: 100.2, end: 120.2 };
   assert.equal(checkHits(p, [train], 100, cfg, 99.8).crash, false);
 });
+
+test('moving train front arriving this frame is head-on even mid-switch', () => {
+  const p = createPlayer();
+  handleAction(p, 'right', cfg);
+  p.x = 1.6;
+  // Last frame its front was 1 m ahead of the runner; this frame it reached them.
+  const train = { id: ++id, kind: 'train', lane: 2, start: 99.8, end: 109.8, prevStart: 101, speed: 10 };
+  assert.deepEqual(checkHits(p, [train], 100, cfg, 99.7), { crash: true, sideBump: false, coins: [] });
+});

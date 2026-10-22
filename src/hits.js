@@ -35,7 +35,8 @@ export function checkHits(player, items, distance, cfg, prevDistance = -Infinity
     const base = item.base ?? 0;
     if (!overlaps(player.y, player.y + box.height, base + bottom, base + top)) continue;
     if (isCoin(item.kind)) result.coins.push(item.id);
-    else if (switching && item.start < prevFront) result.sideBump = true;
+    // A moving train's front moves too, so compare with where it was last frame.
+    else if (switching && (item.prevStart ?? item.start) < prevFront) result.sideBump = true;
     else result.crash = true;
   }
   return result;

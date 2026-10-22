@@ -125,3 +125,52 @@ test('coins on a roof or ramp sit on that surface', () => {
   assert.equal(roofHigh.kind, 'highcoin');
   assert.equal(roofHigh.base, 3.6);
 });
+
+const MOVING = parseSections(`name: oncoming
+. . .
+. . .
+. M .
+. M .
+. . .`);
+const movingOpts = { ...opts, trainSpeed: 10 };
+
+test('stacked M rows become one moving train', () => {
+  const track = createTrack(MOVING, movingOpts, seeded());
+  track.fill(36 + 25);
+  const trains = track.items.filter((i) => i.kind === 'train');
+  assert.equal(trains.length, 1);
+  assert.equal(trains[0].speed, 10);
+  assert.equal(trains[0].end - trains[0].start, 10);
+});
+
+test('a moving train is placed further away so it meets the runner where the map shows', () => {
+  const track = createTrack(MOVING, movingOpts, seeded());
+  const runSpeed = 20;
+  track.fill(36 + 25, 0, runSpeed);
+  const [train] = track.items;
+  const mapStart = 36 + 5; // second row of the section
+  assert.equal(train.start, mapStart + mapStart * 10 / runSpeed);
+  // Run both forward at constant speed until the runner reaches the map position.
+  let distance = 0;
+  const dt = 1 / 60;
+  while (distance + runSpeed * dt <= mapStart + 1e-9) {
+    distance += runSpeed * dt;
+    track.move(dt);
+  }
+  assert.ok(Math.abs(train.start - distance) < 0.6, `met at ${train.start}, runner at ${distance}`);
+});
+
+test('move shifts only moving trains and remembers where they were', () => {
+  const track = createTrack([...MOVING, ...SECTIONS], movingOpts, seeded());
+  track.fill(300, 0, 20);
+  const before = track.items.map((i) => i.start);
+  track.move(0.5);
+  track.items.forEach((item, k) => {
+    if (item.speed) {
+      assert.equal(item.prevStart, before[k]);
+      assert.equal(item.start, before[k] - 5);
+    } else {
+      assert.equal(item.start, before[k]);
+    }
+  });
+});

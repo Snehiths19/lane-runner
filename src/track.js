@@ -1,27 +1,31 @@
 // The endless track: sections chained one after another, as items placed by distance.
 // An item is { id, kind, lane, start, end, base }; start/end are metres from the run's start and
 // base is the height of the surface it sits on (0 = track; roof or ramp for raised coins).
+// A moving train also has speed (metres per second toward the runner) and prevStart (last frame's front).
 
 const KIND = { L: 'low', O: 'over', B: 'train', c: 'coin', '^': 'highcoin' };
 const DEPTH = { low: 0.4, over: 0.4, coin: 0.6, highcoin: 0.6 };
 
-export function createTrack(sections, { rowLength, startClear, roofHeight }, random = Math.random) {
+export function createTrack(sections, { rowLength, startClear, roofHeight, trainSpeed = 0 }, random = Math.random) {
   const items = [];
   let nextStart = startClear;
   let nextId = 1;
   let last = null;
 
-  function place(section, offset) {
+  // distance/runSpeed: where the runner is now and how fast, so a moving train can start far enough
+  // away to meet them where the map shows it.
+  function place(section, offset, distance, runSpeed) {
     const added = [];
     const openTrain = [null, null, null]; // a train still growing in each lane
     section.rows.forEach((row, r) => {
       const rowStart = offset + r * rowLength;
       const centre = rowStart + rowLength / 2;
       row.forEach((cell, lane) => {
-        if (cell.obstacle === 'B') {
-          // Stacked B rows form one long train.
-          if (openTrain[lane]) openTrain[lane].end = rowStart + rowLength;
-          else added.push(openTrain[lane] = { id: nextId++, kind: 'train', lane, start: rowStart, end: rowStart + rowLength, base: 0 });
+        if (cell.obstacle === 'B' || cell.obstacle === 'M') {
+          // Stacked B (or M) rows form one long train.
+          const speed = cell.obstacle === 'M' ? trainSpeed : 0;
+          if (openTrain[lane]?.speed === speed) openTrain[lane].end = rowStart + rowLength;
+          else added.push(openTrain[lane] = { id: nextId++, kind: 'train', lane, start: rowStart, end: rowStart + rowLength, base: 0, speed });
         } else {
           openTrain[lane] = null;
         }
@@ -29,7 +33,7 @@ export function createTrack(sections, { rowLength, startClear, roofHeight }, ran
           added.push({ id: nextId++, kind: 'ramp', lane, start: rowStart, end: rowStart + rowLength, base: 0 });
         }
         for (const symbol of [cell.obstacle, cell.coin]) {
-          if (!symbol || symbol === 'B' || symbol === 'R') continue;
+          if (!symbol || symbol === 'B' || symbol === 'R' || symbol === 'M') continue;
           const kind = KIND[symbol];
           const half = DEPTH[kind] / 2;
           // Coins ride on the surface of their cell: a train roof, or halfway up a ramp.
@@ -38,16 +42,33 @@ export function createTrack(sections, { rowLength, startClear, roofHeight }, ran
         }
       });
     });
+    for (const item of added) {
+      if (!item.speed) continue;
+      const lead = Math.max(0, item.start - distance) * item.speed / runSpeed;
+      item.start += lead;
+      item.end += lead;
+      item.prevStart = item.start;
+    }
     items.push(...added.sort((x, y) => x.start - y.start));
   }
 
-  function fill(upTo) {
+  // Moving trains drive toward the runner.
+  function move(dt) {
+    for (const item of items) {
+      if (!item.speed) continue;
+      item.prevStart = item.start;
+      item.start -= item.speed * dt;
+      item.end -= item.speed * dt;
+    }
+  }
+
+  function fill(upTo, distance = 0, runSpeed = Infinity) {
     while (nextStart < upTo) {
       // Never the same section twice in a row (when there's a choice).
       const choices = sections.length > 1 ? sections.filter((s) => s !== last) : sections;
       const section = choices[Math.floor(random() * choices.length)];
       last = section;
-      place(section, nextStart);
+      place(section, nextStart, distance, runSpeed);
       nextStart += section.rows.length * rowLength;
     }
   }
@@ -65,5 +86,5 @@ export function createTrack(sections, { rowLength, startClear, roofHeight }, ran
     last = null;
   }
 
-  return { items, fill, dropBefore, reset };
+  return { items, fill, move, dropBefore, reset };
 }
