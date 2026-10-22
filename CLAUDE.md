@@ -1,5 +1,9 @@
 # Lane Runner — Claude instructions
 
+**Start here:** read `STATUS.md` (where the project stands, the working process, and the next slice's
+agenda), then `CONTEXT.md` (glossary + invariants) and `FEATURES.md` (roadmap). Update `STATUS.md`
+at the end of every slice.
+
 ## About the owner
 Snehith is not a coder. Claude writes and verifies all code; Snehith plays, gives feel feedback,
 and makes gameplay/design decisions. Present those decisions as plain-language choices, not code.
@@ -35,6 +39,8 @@ and makes gameplay/design decisions. Present those decisions as plain-language c
   the tweak in FEATURES.md's *Your tweak* column. The fingerprint changes automatically.
 - New gameplay numbers go in the baseline under their area (e.g. `powerUps.jetpack.duration`) with the
   FEATURES.md ID and source; 🧪 marks placeholders awaiting measurement.
+
+- `tools/measure/`: recording and reading Subway Surfers gameplay frames for 🧪 numbers (see its README).
 
 ## Commands
 - `npm test` — run unit tests (Node built-in runner). Only commit when it reports `fail 0`.
