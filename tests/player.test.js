@@ -156,3 +156,12 @@ test('baseline jump matches Subway Surfers air time (~0.7 s, measured 2026-10-22
   while (!p.grounded && t < 2) { updatePlayer(p, 1 / 240, cfg); t += 1 / 240; }
   assert.ok(Math.abs(t - 0.7) < 0.02, `air time ${t.toFixed(3)} s`);
 });
+
+test('lands on the supplied ground height', () => {
+  const p = createPlayer();
+  p.y = 1.5;
+  handleAction(p, 'jump', cfg);
+  for (let i = 0; i < 60; i++) updatePlayer(p, 1 / 60, cfg, 1.5);
+  assert.equal(p.grounded, true);
+  assert.equal(p.y, 1.5);
+});

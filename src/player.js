@@ -55,7 +55,8 @@ export function isSliding(p) {
 
 const easeOut = (t) => 1 - (1 - t) * (1 - t);
 
-export function updatePlayer(p, dt, cfg) {
+// groundY: ground height under the runner (CONTEXT: ground height comes from one place).
+export function updatePlayer(p, dt, cfg, groundY = 0) {
   if (p.switchT < 1) p.switchT = Math.min(1, p.switchT + dt / cfg.laneSwitchTime);
   p.x = p.fromX + (laneX(p.lane, cfg) - p.fromX) * easeOut(p.switchT);
 
@@ -63,8 +64,8 @@ export function updatePlayer(p, dt, cfg) {
     // Exact for constant gravity, so the jump arc is the same at any frame rate.
     p.y += p.vy * dt - 0.5 * cfg.gravity * dt * dt;
     p.vy -= cfg.gravity * dt;
-    if (p.y <= 0) {
-      p.y = 0;
+    if (p.y <= groundY) {
+      p.y = groundY;
       p.vy = 0;
       p.grounded = true;
       if (p.slideQueued) {
