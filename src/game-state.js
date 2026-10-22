@@ -1,14 +1,23 @@
-// Game states: 'start' -> 'running' <-> 'paused' ('crashed' arrives in step 2).
+// Run states (CONTEXT.md): 'start' -> 'running' <-> 'paused' -> 'crashed' -> crash screen -> new run.
 // Movement and world time only advance while running.
 
 export function createGame() {
-  return { state: 'start', distance: 0 };
+  return { state: 'start', distance: 0, coins: 0, runId: 1, crashedAt: null, crashScreenShown: false };
+}
+
+function startNewRun(g) {
+  Object.assign(g, { state: 'running', distance: 0, coins: 0, runId: g.runId + 1, crashedAt: null, crashScreenShown: false });
 }
 
 // Returns the action the runner should perform, or null if it should be ignored.
 export function routeAction(g, action) {
   if (g.state === 'start') {
     g.state = 'running';
+    return null;
+  }
+  if (g.state === 'crashed') {
+    // Taps only count once the crash screen is showing, and then only restart.
+    if (g.crashScreenShown) startNewRun(g);
     return null;
   }
   return g.state === 'running' ? action : null;
@@ -31,4 +40,21 @@ export function advance(g, dt, speed) {
 // instead of jumping ahead in time.
 export function clampDt(dt) {
   return Math.min(dt, 0.05);
+}
+
+// The runner hit something: the world stops. `now` is in seconds.
+export function crash(g, now) {
+  g.state = 'crashed';
+  g.crashedAt = now;
+}
+
+// True once `delay` seconds have passed since the crash; the crash screen shows from then on.
+export function crashScreenReady(g, now, delay) {
+  if (g.state === 'crashed' && now - g.crashedAt >= delay) g.crashScreenShown = true;
+  return g.crashScreenShown;
+}
+
+// Subway-style score: distance-based points times the score multiplier (x1 until missions exist).
+export function score(g, rules, multiplier = 1) {
+  return Math.floor(g.distance * rules.scoring.pointsPerMetre * multiplier);
 }

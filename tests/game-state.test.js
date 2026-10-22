@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, routeAction, setPaused, advance, clampDt } from '../src/game-state.js';
+import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score } from '../src/game-state.js';
 
 test('begins on the start screen', () => {
   const g = createGame();
@@ -55,4 +55,46 @@ test('distance accumulates while running', () => {
 test('clampDt caps large frame gaps (tab hidden, phone locked)', () => {
   assert.equal(clampDt(30), 0.05);
   assert.equal(clampDt(0.016), 0.016);
+});
+
+function runningGame() {
+  const g = createGame();
+  routeAction(g, 'jump');
+  return g;
+}
+
+test('a crash stops time and the runner', () => {
+  const g = runningGame();
+  crash(g, 10);
+  assert.equal(g.state, 'crashed');
+  assert.equal(advance(g, 0.016, 12), 0);
+  assert.equal(routeAction(g, 'left'), null);
+});
+
+test('taps before the crash screen are ignored', () => {
+  const g = runningGame();
+  crash(g, 10);
+  assert.equal(crashScreenReady(g, 10.5, 1), false);
+  assert.equal(routeAction(g, 'jump'), null);
+  assert.equal(g.state, 'crashed');
+});
+
+test('a tap on the crash screen starts a new, clean run', () => {
+  const g = runningGame();
+  g.distance = 250;
+  g.coins = 7;
+  const runId = g.runId;
+  crash(g, 10);
+  assert.equal(crashScreenReady(g, 11, 1), true);
+  assert.equal(routeAction(g, 'jump'), null, 'the tap only restarts');
+  assert.equal(g.state, 'running');
+  assert.equal(g.distance, 0);
+  assert.equal(g.coins, 0);
+  assert.notEqual(g.runId, runId);
+});
+
+test('score is distance times points per metre times the multiplier, rounded down', () => {
+  const g = runningGame();
+  g.distance = 100;
+  assert.equal(score(g, { scoring: { pointsPerMetre: 14.6 / 12 } }), 121);
 });
