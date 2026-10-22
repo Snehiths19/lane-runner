@@ -110,3 +110,31 @@ test('rejects two obstacles in one cell', () => {
 . LO .
 . . .`), /pile.*line 3.*only one obstacle per cell/);
 });
+
+test('M is a moving train; stacked M rows parse', () => {
+  const [s] = parseSections(`name: oncoming
+. . .
+. . .
+c M .
+c M .
+. . .`);
+  assert.equal(s.rows[1][1].obstacle, 'M');
+  assert.equal(s.rows[2][1].obstacle, 'M');
+});
+
+test('rejects a ramp in front of a moving train', () => {
+  assert.throws(() => parseSections(`name: rampmove
+. . .
+. M .
+. R .
+. . .`), /rampmove.*line 4.*ramp must lead onto a train/);
+});
+
+test('rejects anything in a moving train lane beyond it', () => {
+  assert.throws(() => parseSections(`name: blocked
+. . .
+. c .
+. . .
+. M .
+. . .`), /blocked.*line 3.*moving train's lane must be empty/);
+});

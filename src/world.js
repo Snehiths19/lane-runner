@@ -2,7 +2,8 @@
 // The runner stays at z = 0; tiles move toward the camera (+z) and wrap to the back.
 
 import * as THREE from 'three';
-import { fovForAspect } from './view.js';
+import { fovForAspect, followCamera } from './view.js';
+import { tunnelsBetween } from './tunnels.js';
 import { RULES } from './rules/index.js';
 
 const ROOF = RULES.track.roofHeight;
@@ -140,6 +141,8 @@ function buildItemFactory() {
     post: new THREE.MeshLambertMaterial({ color: 0x555555 }),
     sign: new THREE.MeshLambertMaterial({ map: stripes('#d62828', '#ffffff') }),
     train: new THREE.MeshLambertMaterial({ color: 0x8d99a6 }),
+    movingTrain: new THREE.MeshLambertMaterial({ color: 0xc0573e }),
+    headlight: new THREE.MeshBasicMaterial({ color: 0xfff3b0 }),
     roof: new THREE.MeshLambertMaterial({ color: 0x5f6b77 }),
     window: new THREE.MeshLambertMaterial({ color: 0x2b3a4a }),
     ramp: new THREE.MeshLambertMaterial({ color: 0xb08a5a }),
@@ -153,6 +156,7 @@ function buildItemFactory() {
   const coinGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.08, 20);
   coinGeo.rotateX(Math.PI / 2);
 
+  // kind: an item kind, or 'movingTrain' for a train with speed (a different colour and headlights).
   return function build(kind) {
     const g = new THREE.Group();
     const body = new THREE.Group(); // stretched to lane width
@@ -163,13 +167,21 @@ function buildItemFactory() {
     } else if (kind === 'over') {
       body.add(box(0.8, 0.8, 0.15, m.sign, 1.4));
       body.add(box(0.06, 1.8, 0.06, m.post, 0.9).translateX(-0.42), box(0.06, 1.8, 0.06, m.post, 0.9).translateX(0.42));
-    } else if (kind === 'train') {
+    } else if (kind === 'train' || kind === 'movingTrain') {
       // A train car; its length is set per item.
       // Body plus a darker roof whose top is exactly the runnable roof height.
-      body.add(box(0.8, ROOF - 0.3, 1, m.train, (ROOF - 0.3) / 2), box(0.84, 0.3, 1, m.roof, ROOF - 0.15));
+      const paint = kind === 'movingTrain' ? m.movingTrain : m.train;
+      body.add(box(0.8, ROOF - 0.3, 1, paint, (ROOF - 0.3) / 2), box(0.84, 0.3, 1, m.roof, ROOF - 0.15));
       const win = box(0.82, 0.7, 1, m.window, 2.3);
       win.scale.z = 0.9;
       body.add(win);
+      if (kind === 'movingTrain') {
+        // Headlights on the front (the end facing the runner), placed per item.
+        const lights = new THREE.Group();
+        lights.add(box(0.12, 0.12, 0.05, m.headlight, 0.9).translateX(-0.25), box(0.12, 0.12, 0.05, m.headlight, 0.9).translateX(0.25));
+        body.add(lights);
+        g.userData.lights = lights;
+      }
     } else if (kind === 'ramp') {
       // A plank rising from the track (near end) to the roof (far end).
       const slope = Math.atan2(ROOF, RAMP_LENGTH);
@@ -241,6 +253,49 @@ export function createWorld(canvas) {
   shadow.position.y = 0.03;
   scene.add(shadow);
 
+  // Tunnels (looks only): two walls just outside the lanes and a high ceiling, built 1 m long and
+  // stretched to each tunnel's length. Two are enough, since tunnels are far apart.
+  const tunnelMat = new THREE.MeshLambertMaterial({ color: 0x3d3d46, side: THREE.DoubleSide });
+  const portalMat = new THREE.MeshLambertMaterial({ color: 0x7a4b3a });
+  const { height: TUNNEL_HEIGHT } = RULES.track.tunnel;
+  const tunnelPool = [0, 1].map(() => {
+    const t = new THREE.Group();
+    const shell = new THREE.Group(); // stretched along the track
+    const wallGeo = new THREE.BoxGeometry(0.4, TUNNEL_HEIGHT, 1);
+    const left = new THREE.Mesh(wallGeo, tunnelMat);
+    const right = new THREE.Mesh(wallGeo, tunnelMat);
+    const ceiling = new THREE.Mesh(new THREE.BoxGeometry(1, 0.4, 1), tunnelMat);
+    left.position.y = right.position.y = TUNNEL_HEIGHT / 2;
+    ceiling.position.y = TUNNEL_HEIGHT + 0.2;
+    shell.add(left, right, ceiling);
+    const portal = new THREE.Mesh(new THREE.BoxGeometry(1, 1.2, 0.6), portalMat); // beam over the entrance
+    portal.position.y = TUNNEL_HEIGHT + 0.4;
+    t.add(shell, portal);
+    t.userData = { shell, left, right, ceiling, portal };
+    t.visible = false;
+    scene.add(t);
+    return t;
+  });
+
+  function syncTunnels(distance, laneWidth) {
+    const half = 1.7 * laneWidth + 0.8;
+    const shown = tunnelsBetween(distance - 10, distance + 160, RULES.track.tunnel);
+    tunnelPool.forEach((t, i) => {
+      const tunnel = shown[i];
+      t.visible = Boolean(tunnel);
+      if (!tunnel) return;
+      const { shell, left, right, ceiling, portal } = t.userData;
+      const length = tunnel.end - tunnel.start;
+      shell.scale.z = length;
+      left.position.x = -half;
+      right.position.x = half;
+      ceiling.scale.x = 2 * half + 0.4;
+      portal.scale.x = 2 * half + 0.8;
+      portal.position.z = length / 2; // the entrance, facing the runner
+      t.position.z = -((tunnel.start + tunnel.end) / 2 - distance);
+    });
+  }
+
   const inspector = buildInspector();
   const dog = buildDog();
   scene.add(inspector, dog);
@@ -258,8 +313,13 @@ export function createWorld(canvas) {
       live.add(item.id);
       let mesh = itemMeshes.get(item.id);
       if (!mesh) {
-        mesh = buildItem(item.kind);
+        mesh = buildItem(item.speed ? 'movingTrain' : item.kind);
         if (item.kind === 'train') mesh.userData.body.scale.z = item.end - item.start;
+        // Undo the body's stretch so the headlights stay small, and put them on the front face.
+        if (mesh.userData.lights) {
+          mesh.userData.lights.scale.z = 1 / (item.end - item.start);
+          mesh.userData.lights.position.z = 0.5;
+        }
         itemMeshes.set(item.id, mesh);
         itemLayer.add(mesh);
       }
@@ -283,9 +343,11 @@ export function createWorld(canvas) {
   // groundY: surface height under the runner (track or roof); the camera follows it smoothly.
   // chaseGap: how far behind the runner the inspector and dog are (hidden when beyond the camera).
   let cameraSurface = 0;
+  const cam = { x: 0, lift: 0 }; // camera follow (CAM-1): sideways lag and jump lift
   function update(scroll, player, cfg, items = [], distance = 0, time = 0, groundY = 0, dt = 0, chaseGap = Infinity) {
     cameraSurface += (groundY - cameraSurface) * Math.min(1, dt / 0.25 * 3);
     syncItems(items, distance, cfg, time);
+    syncTunnels(distance, cfg.laneWidth);
     if (cfg.laneWidth !== laneWidth) {
       laneWidth = cfg.laneWidth;
       for (const t of tiles) {
@@ -310,8 +372,9 @@ export function createWorld(canvas) {
     shadow.position.y = groundY + 0.03;
     shadow.scale.setScalar(1 - Math.min((player.y - groundY) / 5, 0.6));
 
-    camera.position.set(player.x * 0.5, 3.6 + cameraSurface, 6);
-    camera.lookAt(player.x * 0.5, 1.4 + cameraSurface, -12);
+    followCamera(cam, { x: player.x * 0.5, lift: RULES.camera.jumpFollow * Math.max(0, player.y - groundY) }, dt, RULES.camera);
+    camera.position.set(cam.x, 3.6 + cameraSurface + cam.lift, 6);
+    camera.lookAt(cam.x, 1.4 + cameraSurface + cam.lift, -12);
 
     chaseX += (player.x - chaseX) * Math.min(1, dt * 6);
     const chaseZ = knockBack + chaseGap;
@@ -338,6 +401,8 @@ export function createWorld(canvas) {
   function crashed() { knockBack = 0.8; }
   function reset() {
     knockBack = 0;
+    cam.x = 0;
+    cam.lift = 0;
     for (const mesh of itemMeshes.values()) itemLayer.remove(mesh);
     itemMeshes.clear();
   }

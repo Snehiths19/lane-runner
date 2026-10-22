@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { parseSections } from '../src/sections.js';
 import { createTrack } from '../src/track.js';
+import { createPlayer, updatePlayer, startIntro } from '../src/player.js';
+import { DEFAULTS } from '../src/config.js';
 
 const opts = { rowLength: 5, startClear: 36, roofHeight: 3.6 };
 const SECTIONS = parseSections(`name: barrier
@@ -124,4 +126,85 @@ test('coins on a roof or ramp sit on that surface', () => {
   assert.equal(roofCoin.base, 3.6);
   assert.equal(roofHigh.kind, 'highcoin');
   assert.equal(roofHigh.base, 3.6);
+});
+
+const MOVING = parseSections(`name: oncoming
+. . .
+. . .
+. M .
+. M .
+. . .`);
+const movingOpts = { ...opts, trainSpeed: 10 };
+
+test('stacked M rows become one moving train', () => {
+  const track = createTrack(MOVING, movingOpts, seeded());
+  track.fill(36 + 25);
+  const trains = track.items.filter((i) => i.kind === 'train');
+  assert.equal(trains.length, 1);
+  assert.equal(trains[0].speed, 10);
+  assert.equal(trains[0].end - trains[0].start, 10);
+});
+
+test('a moving train is placed further away so it meets the runner where the map shows', () => {
+  const track = createTrack(MOVING, movingOpts, seeded());
+  const runSpeed = 20;
+  track.fill(36 + 25, 0, runSpeed);
+  const [train] = track.items;
+  const mapStart = 36 + 5; // second row of the section
+  assert.equal(train.start, mapStart + mapStart * 10 / runSpeed);
+  // Run both forward at constant speed until the runner reaches the map position.
+  let distance = 0;
+  const dt = 1 / 60;
+  while (distance + runSpeed * dt <= mapStart + 1e-9) {
+    distance += runSpeed * dt;
+    track.move(dt);
+  }
+  assert.ok(Math.abs(train.start - distance) < 0.6, `met at ${train.start}, runner at ${distance}`);
+});
+
+test('move shifts only moving trains and remembers where they were', () => {
+  const track = createTrack([...MOVING, ...SECTIONS], movingOpts, seeded());
+  track.fill(300, 0, 20);
+  const before = track.items.map((i) => i.start);
+  track.move(0.5);
+  track.items.forEach((item, k) => {
+    if (item.speed) {
+      assert.equal(item.prevStart, before[k]);
+      assert.equal(item.start, before[k] - 5);
+    } else {
+      assert.equal(item.start, before[k]);
+    }
+  });
+});
+
+test('the intro train passes under the runner during the intro leap', () => {
+  for (const runSpeed of [12, 20]) {
+    const cfg = { ...DEFAULTS, runSpeed };
+    const track = createTrack(SECTIONS, movingOpts, seeded());
+    track.addIntroTrain({ runSpeed, gravity: cfg.gravity, leapHeight: 5 });
+    const [train] = track.items;
+    assert.equal(train.lane, 1);
+    const p = createPlayer();
+    startIntro(p, cfg, 5);
+    let distance = 0;
+    let passed = false;
+    for (let t = 0; t < 1.5; t += 1 / 60) {
+      updatePlayer(p, 1 / 60, cfg);
+      distance += runSpeed / 60;
+      track.move(1 / 60);
+      const under = train.start <= distance + 0.3 && train.end >= distance - 0.3;
+      if (under) assert.ok(p.y > opts.roofHeight, `speed ${runSpeed}: y ${p.y.toFixed(2)} over the train`);
+      if (train.end < distance) passed = true;
+    }
+    assert.ok(passed, `speed ${runSpeed}: the train went past`);
+  }
+});
+
+test('sections start only after the intro leap lands, even with slow tuning', () => {
+  const track = createTrack(SECTIONS, movingOpts, seeded());
+  track.addIntroTrain({ runSpeed: 40, gravity: 10, leapHeight: 5 });
+  track.fill(400, 0, 40);
+  const airTime = 2 * Math.sqrt(2 * 5 / 10);
+  const first = track.items.filter((i) => !i.speed)[0];
+  assert.ok(first.start > airTime * 40, `first item at ${first.start}, landing at ${airTime * 40}`);
 });

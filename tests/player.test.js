@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS } from '../src/config.js';
-import { createPlayer, handleAction, updatePlayer, isSliding, hitbox, bounceBack } from '../src/player.js';
+import { createPlayer, handleAction, updatePlayer, isSliding, hitbox, bounceBack, startIntro } from '../src/player.js';
 
 const cfg = { ...DEFAULTS };
 
@@ -254,4 +254,19 @@ test('edge swipe mid-switch (left twice quickly) is an edge bump', () => {
   assert.equal(p.lane, 0);
   step(p, 0.5);
   assert.ok(Math.abs(p.x - -2.5) < 1e-9, `x was ${p.x}`);
+});
+
+test('intro leap: rises to the leap height, ignores swipes, ends on landing', () => {
+  const p = createPlayer();
+  startIntro(p, cfg, 5);
+  assert.equal(p.intro, true);
+  handleAction(p, 'left', cfg);
+  handleAction(p, 'slide', cfg);
+  assert.equal(p.lane, 1);
+  const maxY = step(p, 1.6);
+  assert.ok(Math.abs(maxY - 5) < 0.05, `peak ${maxY}`);
+  assert.equal(p.grounded, true);
+  assert.equal(p.intro, false);
+  handleAction(p, 'left', cfg);
+  assert.equal(p.lane, 0, 'swipes work again after landing');
 });

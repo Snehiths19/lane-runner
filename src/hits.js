@@ -2,13 +2,13 @@
 // Boxes are compared on three axes: sideways (x), height (y) and along the track (distance).
 
 import { hitbox, laneX } from './player.js';
+import { STEP_UP } from './ground.js';
 
 const RUNNER_DEPTH = 0.6;
 
 // Height range [bottom, top] of each kind of item, above the surface it sits on (item.base).
 // A train is solid up to just under its roof: a runner standing on the roof is safe, and so is one
 // stepping off the top of a ramp (their front reaches the train a moment before their feet do).
-const STEP_UP = 0.5;
 const height = (kind, cfg) => ({ low: [0, 0.8], over: [1.0, 3.0], train: [0, cfg.roofHeight - STEP_UP], coin: [0.3, 1.3], highcoin: [2.0, 3.0] })[kind];
 // Width of each kind, as a share of the lane (obstacles) or in metres (coins).
 const isCoin = (kind) => kind === 'coin' || kind === 'highcoin';
@@ -35,7 +35,8 @@ export function checkHits(player, items, distance, cfg, prevDistance = -Infinity
     const base = item.base ?? 0;
     if (!overlaps(player.y, player.y + box.height, base + bottom, base + top)) continue;
     if (isCoin(item.kind)) result.coins.push(item.id);
-    else if (switching && item.start < prevFront) result.sideBump = true;
+    // A moving train's front moves too, so compare with where it was last frame.
+    else if (switching && (item.prevStart ?? item.start) < prevFront) result.sideBump = true;
     else result.crash = true;
   }
   return result;

@@ -80,7 +80,7 @@ HUD (score + x1 top-right, ⚙️ top-left), hit flash, crash card after ~1 s, b
 - **Side bump bounces back** already in 2b (stumble penalty comes in 2c).
 - Camera follows **surface height** now; jump lift and sideways follow in 2d.
 
-### Slice 2c · chase (grill in the claude.ai project thread, built 10-22)
+### Slice 2c · chase (grill in the claude.ai project thread, built, accepted 10-22)
 - First slice continued from the claude.ai project (phone) instead of the local terminal.
 - He accepts the recommended answer in grills as a rule ("I usually accept all recommendations"), so
   later grills can take the recommendations and list them instead of asking one by one.
@@ -90,6 +90,16 @@ HUD (score + x1 top-right, ⚙️ top-left), hit flash, crash card after ~1 s, b
 - Crash: chasers **run up and grab** within the existing 1 s pause.
 - Chase starts **right away** (close ~2 s, then drops back); the 2d intro leap will go before it.
 - Close gap tuned to 2 m in browser checks so the dog is still on screen on wide PC screens.
+- Published by merging PR #1 straight away; he played it and said "Looks good".
+
+### Slice 2d · alive world (recommendations taken, built 10-22)
+- He asked to "continue all the work", so the grill answers are the recommendations, listed to him
+  for override: moving trains (no ramps, `M`), speed +60% over 150 s 🧪, intro leap over a one-car
+  moving train (graffiti scene waits for art), tunnels look-only, camera lift 40% + 0.12 s side lag 🧪.
+- Browser checks found a real bug: at high speed or low frame rate one frame's step could carry the
+  runner past a train's front, and the ground rule lifted them onto the roof instead of a crash. Fixed
+  in `groundHeightAt` (a roof counts only once you're up there or arrive from the ramp or roof you stood on).
+- Publishing now waits for his go-ahead on the pull request (merging without review was blocked).
 
 ## Ideas parked for later
 

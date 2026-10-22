@@ -10,3 +10,10 @@ export function fovForAspect(aspect, { baseFov = 60, minHorizontalFov = 55, maxF
   const needed = toDeg(2 * Math.atan(Math.tan(toRad(minHorizontalFov) / 2) / aspect));
   return Math.min(maxFov, Math.max(baseFov, needed));
 }
+
+// Camera follow (CAM-1): eases cam.x and cam.lift toward the target, each with its own lag in
+// seconds. Exponential easing, so the motion is the same at any frame rate.
+export function followCamera(cam, target, dt, { sideLag, liftLag }) {
+  cam.x += (target.x - cam.x) * (1 - Math.exp(-dt / sideLag));
+  cam.lift += (target.lift - cam.lift) * (1 - Math.exp(-dt / liftLag));
+}

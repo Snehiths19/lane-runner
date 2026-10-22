@@ -13,16 +13,34 @@ export const BASELINE = {
     slideTime: 0.6,       // MOV-4 🧪 seconds a roll lasts
     fastFallSpeed: 30,    // MOV-4 🧪 downward speed when swiping down mid-air
   },
+  speedRamp: {
+    rampTime: 150,        // MOV-6 🧪 seconds until the speed stops rising
+    maxBoost: 0.6,        // MOV-6 🧪 share added to run speed at the cap (×1.6)
+  },
   track: {
     rowLength: 5,         // TRK-1 metres per section-map line (our call)
     startClear: 36,       // CHS-2 empty track at run start until the intro leap exists (our call)
     roofHeight: 3.6,      // TRK-5 🧪 train roof height; above jump reach so only ramps get you up (our call)
+    trainSpeed: 10,       // TRK-6 🧪 metres per second a moving train drives toward the runner
+    tunnel: {
+      every: 400,         // TRK-9 metres from one tunnel's start to the next (our call)
+      length: 60,         // TRK-9 metres (our call)
+      height: 8.5,        // TRK-9 ceiling height, above the camera on a roof (our call)
+    },
   },
   scoring: {
     pointsPerMetre: 14.6 / 12, // SCO-1 ≈14.6 points/s at x1 measured 2026-10-22, ÷ baseline run speed
   },
   crash: {
     screenDelay: 1.0,     // RUN-1 🧪 seconds from crash to crash screen
+  },
+  intro: {
+    leapHeight: 5,        // CHS-2 height of the opening leap over the intro train (our call, above roofs)
+  },
+  camera: {
+    jumpFollow: 0.4,      // CAM-1 🧪 share of the runner's height above the ground the camera rises
+    sideLag: 0.12,        // CAM-1 🧪 seconds the camera takes to catch up sideways
+    liftLag: 0.15,        // CAM-1 seconds the camera takes to catch up with a jump (our call)
   },
   chase: {
     stumbleTime: 3,       // HIT-3 🧪 seconds a stumble lasts (second bump inside it = crash)
