@@ -85,7 +85,11 @@ Continuing a crashed run by spending keys, offered right after a crash.
 _Avoid_: save me (that's the button copy), continue
 
 **Crash screen**:
-What shows after a crash and any revive offer: the run's score, coins and best score, with "New best!" when beaten.
+The notebook-style card after a run ends: score, coins, best score ("New best!" when beaten), top runs, and PLAY; Menu and Boosts buttons join when those features exist.
+
+**Top runs**:
+The five best scores on this device, shown where Subway Surfers shows its friends leaderboard.
+_Avoid_: leaderboard (that implies other players)
 
 **Best score**:
 The highest score reached on this device, shown on the crash screen.
@@ -135,7 +139,7 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 - **Hitbox is separate from image.** Collisions never use image size.
 - **The tap that leaves the start screen or crash screen never also moves the runner**, and crash-screen taps are ignored until it appears.
 - **Baseline values are never edited to suit taste.** Taste goes in tweaks; the baseline only changes when better evidence about Subway Surfers arrives.
-- **Best score is not a tuning value.** It's stored apart from slider tweaks and survives a defaults reset.
+- **Best score and top runs are not tuning values.** They're stored apart from slider tweaks and survive a defaults reset.
 - **A lane change remembers the lane it left**, so a side bump can bounce the runner back mid-switch.
 
 ## Example dialogue
