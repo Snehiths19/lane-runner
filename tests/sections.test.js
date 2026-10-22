@@ -138,3 +138,38 @@ test('rejects anything in a moving train lane beyond it', () => {
 . M .
 . . .`), /blocked.*line 3.*moving train's lane must be empty/);
 });
+
+test('rejects a two-lane switch between trains without room to make it', () => {
+  // Trains in the middle and right, then 2 empty rows, then trains in the left and middle:
+  // from the left lane you must cross two lanes in 10 m.
+  assert.throws(() => parseSections(`name: tight
+. . .
+B B .
+. . .
+. . .
+. B B
+. . .`), /tight.*line 3.*two lanes/);
+});
+
+test('a two-lane switch with 4 clear rows is fine', () => {
+  assert.doesNotThrow(() => parseSections(`name: roomy
+. . .
+B B .
+. . .
+. . .
+. . .
+. . .
+. B B
+. . .`));
+});
+
+test('rejects two sections whose join forces a tight two-lane switch', () => {
+  assert.throws(() => parseSections(`name: endsleft
+. . .
+. B B
+. . .
+name: startsright
+. . .
+B B .
+. . .`), /endsleft.*startsright.*two lanes/);
+});
