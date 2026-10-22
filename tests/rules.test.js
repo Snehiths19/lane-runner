@@ -42,3 +42,20 @@ test('inputs are not mutated', () => {
   assert.deepEqual(t, { movement: { runSpeed: 20 } });
   assert.equal(Object.isFrozen(b.movement), false);
 });
+
+test('shipped tweaks resolve against the baseline', async () => {
+  const { BASELINE, RULES } = await import('../src/rules/index.js');
+  assert.equal(BASELINE.movement.runSpeed, 12);
+  assert.equal(RULES.movement.runSpeed, 20);
+});
+
+test('slider defaults come from the rules and match today\'s values', async () => {
+  const { DEFAULTS } = await import('../src/config.js');
+  const { RULES } = await import('../src/rules/index.js');
+  assert.deepEqual(DEFAULTS, {
+    runSpeed: 20, laneWidth: 2.5, laneSwitchTime: 0.12, jumpHeight: 2.2,
+    gravity: 45, slideTime: 0.6, fastFallSpeed: 30,
+  });
+  assert.notEqual(DEFAULTS, RULES.movement);
+  assert.equal(Object.isFrozen(DEFAULTS), false, 'sliders need a mutable copy');
+});

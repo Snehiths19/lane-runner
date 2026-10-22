@@ -1,14 +1,8 @@
-// Default tuning values. The on-screen panel edits a live copy of these,
-// so every number here can be changed while playing.
-export const DEFAULTS = {
-  runSpeed: 20,         // world units per second
-  laneWidth: 2.5,       // distance between lane centres
-  laneSwitchTime: 0.12, // seconds to move one lane
-  jumpHeight: 2.2,      // peak height of a jump
-  gravity: 45,          // higher = snappier jump (same height, less air time)
-  slideTime: 0.6,       // seconds a slide lasts
-  fastFallSpeed: 30,    // downward speed when swiping down mid-air
-};
+import { RULES } from './rules/index.js';
+
+// Default slider values: the movement rules (baseline + tweaks). The on-screen panel edits a
+// live copy, so every number here can be changed while playing.
+export const DEFAULTS = { ...RULES.movement };
 
 // Identifies a set of defaults. Saved slider tweaks are only kept while this matches.
 export function defaultsFingerprint(defaults) {
