@@ -16,8 +16,10 @@ Runs on PC (keyboard) and phone (swipe). No install needed — open the hosted p
 
 ## Playing
 
-Dodge **low barriers** (jump), **overhead bars** (roll) and **blockers** (change lanes); grab coins,
-including high ones you have to jump for. Running into anything ends the run; the score card shows
+Dodge **low barriers** (jump), **overhead bars** (roll) and **trains** (change lanes); trains with a
+**ramp** can be run up onto, so you can run along the roofs, hop between neighbouring roofs and drop
+back down. Swiping into the side of a train bounces you back. Grab coins, including high ones you
+have to jump for and coins along the roofs. Running into the front of anything ends the run; the score card shows
 your score, best score and your top 5 runs on this device. Tap PLAY (or Space) to go again.
 
 ## Designing track sections
