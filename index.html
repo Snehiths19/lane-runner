@@ -15,12 +15,28 @@
   <div id="app">
     <main id="stage">
       <canvas id="game"></canvas>
-      <div id="hud"><span id="distance">0 m</span></div>
+      <div id="hud" aria-live="off">
+        <div class="score-row"><span class="mult">x1</span><span id="score">000000</span></div>
+        <div class="coin-row"><span id="coins">0</span><span class="coin-icon" aria-hidden="true"></span></div>
+      </div>
+      <div id="flash" aria-hidden="true"></div>
       <button id="gear" type="button" aria-label="Tuning" aria-expanded="false">⚙️</button>
       <div id="start" class="overlay">
         <h1>Lane Runner</h1>
         <p class="cta">Tap / press Space to run</p>
         <p class="hint">Swipe or use arrow keys to move</p>
+      </div>
+      <div id="crash" class="overlay" hidden>
+        <div class="card">
+          <div class="spiral" aria-hidden="true"></div>
+          <h2>Score</h2>
+          <div class="final-score">0</div>
+          <div class="final-row"><span class="coin-icon" aria-hidden="true"></span><span class="final-coins">0</span></div>
+          <p class="new-best" hidden>New best!</p>
+          <p class="best-row">Best <span class="best">0</span></p>
+          <ol class="top-runs" aria-label="Top runs"></ol>
+          <button type="button" class="play">PLAY</button>
+        </div>
       </div>
       <div id="notice" role="status" hidden></div>
     </main>

@@ -3,7 +3,7 @@
 
 import * as THREE from 'three';
 import { fovForAspect } from './view.js';
-import { isSliding } from './player.js';
+import { isSliding, laneX } from './player.js';
 
 const TILE_LENGTH = 20;
 const TILE_COUNT = 8;
@@ -73,6 +73,67 @@ function buildRunner() {
   return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ map: texture, transparent: true, alphaTest: 0.1 }));
 }
 
+// Placeholder looks for track items (real art comes later as skins). Built at lane width 1 and
+// stretched sideways to the live lane width; heights match the hitboxes in hits.js.
+function stripes(a, b) {
+  const c = document.createElement('canvas');
+  c.width = 64;
+  c.height = 16;
+  const g = c.getContext('2d');
+  for (let i = 0; i < 8; i++) {
+    g.fillStyle = i % 2 ? b : a;
+    g.beginPath(); g.moveTo(i * 8, 0); g.lineTo(i * 8 + 8, 0); g.lineTo(i * 8, 16); g.lineTo(i * 8 - 8, 16); g.fill();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+function buildItemFactory() {
+  const m = {
+    barrier: new THREE.MeshLambertMaterial({ map: stripes('#f2c200', '#222222') }),
+    post: new THREE.MeshLambertMaterial({ color: 0x555555 }),
+    sign: new THREE.MeshLambertMaterial({ map: stripes('#d62828', '#ffffff') }),
+    train: new THREE.MeshLambertMaterial({ color: 0x8d99a6 }),
+    roof: new THREE.MeshLambertMaterial({ color: 0x5f6b77 }),
+    window: new THREE.MeshLambertMaterial({ color: 0x2b3a4a }),
+    coin: new THREE.MeshLambertMaterial({ color: 0xffc31a, emissive: 0xa86f00 }),
+  };
+  const box = (w, h, d, mat, y) => {
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat);
+    mesh.position.y = y;
+    return mesh;
+  };
+  const coinGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.08, 20);
+  coinGeo.rotateX(Math.PI / 2);
+
+  return function build(kind) {
+    const g = new THREE.Group();
+    const body = new THREE.Group(); // stretched to lane width
+    g.add(body);
+    if (kind === 'low') {
+      body.add(box(0.8, 0.3, 0.2, m.barrier, 0.6));
+      body.add(box(0.06, 0.6, 0.06, m.post, 0.3).translateX(-0.35), box(0.06, 0.6, 0.06, m.post, 0.3).translateX(0.35));
+    } else if (kind === 'over') {
+      body.add(box(0.8, 0.8, 0.15, m.sign, 1.4));
+      body.add(box(0.06, 1.8, 0.06, m.post, 0.9).translateX(-0.42), box(0.06, 1.8, 0.06, m.post, 0.9).translateX(0.42));
+    } else if (kind === 'block') {
+      // A train-car-like box; depth is set per item.
+      body.add(box(0.8, 3.4, 1, m.train, 1.7), box(0.84, 0.3, 1, m.roof, 3.55));
+      const win = box(0.82, 0.7, 1, m.window, 2.3);
+      win.scale.z = 0.9;
+      body.add(win);
+    } else {
+      const coin = new THREE.Mesh(coinGeo, m.coin);
+      coin.position.y = kind === 'highcoin' ? 2.5 : 0.8;
+      g.add(coin);
+      g.userData.coin = coin;
+    }
+    g.userData.body = body;
+    return g;
+  };
+}
+
 export function createWorld(canvas) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -127,10 +188,42 @@ export function createWorld(canvas) {
   shadow.position.y = 0.03;
   scene.add(shadow);
 
+  const buildItem = buildItemFactory();
+  const itemMeshes = new Map(); // item id -> mesh
+  const itemLayer = new THREE.Group();
+  scene.add(itemLayer);
+
+  // Shows the track items (obstacles, coins) at their place relative to the runner's distance.
+  function syncItems(items, distance, cfg, time) {
+    const live = new Set();
+    for (const item of items) {
+      live.add(item.id);
+      let mesh = itemMeshes.get(item.id);
+      if (!mesh) {
+        mesh = buildItem(item.kind);
+        if (item.kind === 'block') mesh.userData.body.scale.z = item.end - item.start;
+        itemMeshes.set(item.id, mesh);
+        itemLayer.add(mesh);
+      }
+      mesh.userData.body.scale.x = cfg.laneWidth;
+      mesh.position.set(laneX(item.lane, cfg), 0, -((item.start + item.end) / 2 - distance));
+      if (mesh.userData.coin) mesh.userData.coin.rotation.y = time * 3;
+    }
+    for (const [id, mesh] of itemMeshes) {
+      if (!live.has(id)) {
+        itemLayer.remove(mesh);
+        itemMeshes.delete(id);
+      }
+    }
+  }
+
   let laneWidth = null;
+  let knockBack = 0;
 
   // scroll: how far the world moved this frame (0 while not running).
-  function update(scroll, player, cfg) {
+  // items/distance: what's on the track and how far the runner has gone; time: seconds, for coin spin.
+  function update(scroll, player, cfg, items = [], distance = 0, time = 0) {
+    syncItems(items, distance, cfg, time);
     if (cfg.laneWidth !== laneWidth) {
       laneWidth = cfg.laneWidth;
       for (const t of tiles) {
@@ -149,7 +242,7 @@ export function createWorld(canvas) {
       }
     }
 
-    runner.position.set(player.x, player.y, 0);
+    runner.position.set(player.x, player.y, knockBack);
     runner.scale.y = isSliding(player) ? 0.5 : 1;
     shadow.position.x = player.x;
     shadow.scale.setScalar(1 - Math.min(player.y / 5, 0.6));
@@ -169,5 +262,13 @@ export function createWorld(canvas) {
     camera.updateProjectionMatrix();
   }
 
-  return { update, resize };
+  // A crash knocks the runner back a little; a new run puts everything back.
+  function crashed() { knockBack = 0.8; }
+  function reset() {
+    knockBack = 0;
+    for (const mesh of itemMeshes.values()) itemLayer.remove(mesh);
+    itemMeshes.clear();
+  }
+
+  return { update, resize, crashed, reset };
 }

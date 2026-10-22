@@ -38,20 +38,39 @@ html, body {
   touch-action: none;
 }
 
+/* HUD like Subway Surfers: score with multiplier top-right, coins under it; ⚙️ top-left. */
 #hud {
   position: absolute;
-  top: max(10px, env(safe-area-inset-top));
-  left: 16px;
-  font-size: 20px;
-  font-weight: 700;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  top: max(8px, env(safe-area-inset-top));
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
   pointer-events: none;
+}
+.score-row, .coin-row { display: flex; gap: 6px; align-items: center; }
+.score-row span, .coin-row {
+  padding: 4px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  font-size: 20px;
+}
+.mult { color: #ffd23f; }
+.coin-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff2a8, #ffc31a 55%, #b37800);
 }
 
 #gear {
   position: absolute;
   top: max(6px, env(safe-area-inset-top));
-  right: 10px;
+  left: 10px;
   width: 44px;
   height: 44px;
   border: 0;
@@ -60,6 +79,16 @@ html, body {
   font-size: 22px;
   cursor: pointer;
 }
+
+#flash {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 40, 40, 0.55);
+  opacity: 0;
+  pointer-events: none;
+}
+#flash.on { animation: hit-flash 0.5s ease-out; }
+@keyframes hit-flash { from { opacity: 1; } to { opacity: 0; } }
 
 .overlay {
   position: absolute;
@@ -155,4 +184,61 @@ html, body {
     border-radius: 16px 16px 0 0;
     padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
+}
+
+/* Crash screen: a notebook-style card, like Subway Surfers' score card. */
+#crash { background: rgba(10, 20, 35, 0.55); }
+#crash .card {
+  position: relative;
+  width: min(320px, calc(100% - 32px));
+  padding: 26px 20px 18px;
+  border-radius: 10px;
+  background: #f4f1e8;
+  color: #1d2a3a;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+#crash .spiral {
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  right: 16px;
+  height: 20px;
+  background: radial-gradient(circle, #9aa3ad 4px, transparent 5px) 0 0 / 18px 20px repeat-x;
+}
+#crash h2 { margin: 0; color: #1f5fae; font-size: 26px; }
+#crash .final-score {
+  margin: 6px auto;
+  padding: 6px 12px;
+  border: 2px dashed #9fc3ef;
+  border-radius: 8px;
+  background: #1f5fae;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+#crash .final-row { display: flex; gap: 6px; justify-content: center; align-items: center; font-weight: 700; }
+#crash .new-best { margin: 8px 0 0; color: #d62828; font-weight: 800; font-size: 18px; }
+#crash .new-best[hidden] { display: none; }
+#crash .best-row { margin: 6px 0; color: #4b5a6b; }
+#crash .top-runs {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  list-style: none;
+  border-top: 1px solid #d5d0c2;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+  font-size: 14px;
+}
+#crash .play {
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 10px;
+  background: #3fae2a;
+  color: #fff;
+  font: inherit;
+  font-size: 22px;
+  font-weight: 800;
+  cursor: pointer;
 }
