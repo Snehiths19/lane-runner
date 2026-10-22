@@ -29,13 +29,13 @@ rough values are marked as such and stay 🧪 until confirmed.
 | MOV-4 | Roll | Swipe down; mid-air swipe down drops fast into a roll | roll time 🧪 (M) | ✅ | |
 | MOV-5 | Run speed | Starts at a base speed | base speed 🧪 (M) | ✅ | Run speed 20 (by feel, 2026-10-18) |
 | MOV-6 | Speed ramp | Speed rises gradually during a run | curve & cap 🧪 (M) | ⬜ | |
-| CAM-1 | Camera follow | Camera rises with the runner during a jump and slides with lane changes, then settles | amount 🧪 (M) | ⬜ | |
+| CAM-1 | Camera follow | Camera follows the surface height (ground/roof), rises with the runner during a jump and slides with lane changes, then settles | amount 🧪 (M) | 🔨 surface follow in 2b; jump/sideways in 2d | |
 | MOV-7 | Edge swipe | Swiping into the wall at the track edge = side bump | — (M) | ⬜ | |
 
 ## M2 · Core loop (track, hits, chase, score)
 
 Built in four playable slices, in order: **2a Dodge & crash** (TRK-1–4, HIT-1, COI-1, SCO-1–2, RUN-1) →
-**2b Trains** (TRK-5, 7, 8) → **2c Chase** (HIT-2–3, CHS-1, MOV-7) → **2d Alive world** (TRK-6, 9, MOV-6,
+**2b Trains** (TRK-5, 7, 8, HIT-2 bounce only, CAM-1 surface follow) → **2c Chase** (HIT-2–3, CHS-1, MOV-7) → **2d Alive world** (TRK-6, 9, MOV-6,
 CHS-2, CAM-1). Revive waits for keys in M4.
 
 | ID | Feature | Baseline | Numbers (source) | Status | Your tweak |
@@ -43,14 +43,14 @@ CHS-2, CAM-1). Revive waits for keys in M4.
 | TRK-1 | Sections | Track built from hand-made sections chained at random (ADR 0001) | 5 m rows (our call) | ✅ | |
 | TRK-2 | Low barrier | Jump over | — (WP) | ✅ | |
 | TRK-3 | Overhead bar | Roll under | — (WP) | ✅ | |
-| TRK-4 | Blocker / wall | Change lanes around it (2a: any touch crashes; side bumps in 2c) | — (WP: "poles, tunnel walls") | ✅ | |
+| TRK-4 | Train without ramp (was "blocker") | Change lanes around it | — (WP: "poles, tunnel walls") | ✅ | |
 | TRK-5 | Parked train | Head-on = crash; can run on its roof | train length 🧪 (M) | 🔨 | |
 | TRK-6 | Moving train | Comes toward you; head-on = crash | train speed 🧪 (M) | ⬜ | |
 | TRK-7 | Ramp | Slope at a train's back to run onto the roof | — (M) | 🔨 | |
 | TRK-8 | Train roofs | Run on top of trains; jump between them; drop off the end | ground height logic | 🔨 | |
 | TRK-9 | Tunnels | Track passes through tunnels (visual + walls) | — (WP) | ⬜ | |
 | HIT-1 | Head-on hit | Crash | — | ✅ | |
-| HIT-2 | Side bump | Bounce back to the lane you left, and stumble | — (G) | 🔨 | |
+| HIT-2 | Side bump | Bounce back to the lane you left, and stumble | — (G) | 🔨 bounce in 2b; stumble in 2c | |
 | HIT-3 | Stumble | Inspector catches up; a second hit while stumbling = crash | window length 🧪 (M) | 🔨 | |
 | CHS-1 | Inspector & dog | Chase you from the start, drop back, close in when you stumble, catch you on crash | — (WP) | 🔨 | |
 | CHS-2 | Intro | Run starts with the character caught spraying graffiti, then chased; the runner opens with a leap over an oncoming train | — (WP, M) | ⬜ | |
