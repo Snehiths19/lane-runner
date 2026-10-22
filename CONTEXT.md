@@ -117,7 +117,10 @@ The text picture a section is written as: one row per stretch of track, one colu
 _Avoid_: level file, layout
 
 **High coin**:
-A coin at jump height, reached only by jumping (written `^`), typically arcing over a low barrier.
+A coin at jump height above whatever is under it (track or roof), reached only by jumping (written `^`), typically arcing over a low barrier.
+
+**Roof coin**:
+A coin on a train's roof (written `Bc` in a section map), reached by running up the train's ramp.
 
 **Friend event** (later):
 A friend appearing mid-run doing something, sometimes giving a **power-up**.
@@ -132,6 +135,7 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 ## Invariants
 
 - **Ground height comes from one place.** Landing and collisions always ask for the ground height under the runner (by lane and distance); it is 0 everywhere until **trains** (slice 2b) add roofs. Nothing may assume y = 0 directly.
+- **A ramp always leads onto a train**: it sits directly in front of a train in the same lane. A ramp leading nowhere is a mistake the checks reject.
 - **Every section starts and ends with all three lanes clear**, so any two sections can follow each other without creating an impossible spot.
 - **Placing is generic.** Whatever puts obstacles on the track must also be able to place coins and friend events.
 - **Hitbox is separate from image.** Collisions never use image size.
