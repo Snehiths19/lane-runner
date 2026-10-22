@@ -14,6 +14,8 @@ export function createPlayer() {
     grounded: true,
     slideLeft: 0, // seconds of slide remaining
     slideQueued: false, // swiped down in the air: slide as soon as we land
+    nudgeDir: 0, // edge swipe: -1 left wall, 1 right wall
+    nudgeT: 1, // 0..1 progress of the edge nudge (1 = done)
   };
 }
 
@@ -26,12 +28,22 @@ export function jumpVelocity(height, gravity) {
   return Math.sqrt(2 * gravity * height);
 }
 
+// Edge swipe nudge: how far toward the wall (share of lane width) and how long (our call).
+const NUDGE = 0.3;
+const NUDGE_TIME = 0.25;
+
 // action: 'left' | 'right' | 'jump' | 'slide'
+// Returns 'edge' for a swipe into the wall at the track edge (a side bump, CONTEXT.md).
 export function handleAction(p, action, cfg) {
   if (action === 'left' || action === 'right') {
     // Allowed mid-air and mid-switch, like Subway Surfers.
-    const next = p.lane + (action === 'left' ? -1 : 1);
-    if (next < 0 || next > 2) return;
+    const dir = action === 'left' ? -1 : 1;
+    const next = p.lane + dir;
+    if (next < 0 || next > 2) {
+      p.nudgeDir = dir;
+      p.nudgeT = 0;
+      return 'edge';
+    }
     p.fromLane = p.lane;
     p.lane = next;
     p.fromX = p.x;
@@ -54,12 +66,14 @@ export function handleAction(p, action, cfg) {
 
 // Side bump: head back to the lane the runner just left, from wherever they are now
 // (CONTEXT.md: a lane change remembers the lane it left).
+// Returns true only when a new bounce starts (a new side bump).
 export function bounceBack(p) {
-  if (p.bouncing) return; // already heading back; still touching the obstacle is expected
+  if (p.bouncing) return false; // already heading back; still touching the obstacle is expected
   p.bouncing = true;
   [p.lane, p.fromLane] = [p.fromLane, p.lane];
   p.fromX = p.x;
   p.switchT = 0;
+  return true;
 }
 
 export function isSliding(p) {
@@ -73,6 +87,10 @@ export function updatePlayer(p, dt, cfg, groundY = 0) {
   if (p.switchT < 1) p.switchT = Math.min(1, p.switchT + dt / cfg.laneSwitchTime);
   if (p.switchT === 1) p.bouncing = false;
   p.x = p.fromX + (laneX(p.lane, cfg) - p.fromX) * easeOut(p.switchT);
+  if (p.nudgeT < 1) {
+    p.nudgeT = Math.min(1, p.nudgeT + dt / NUDGE_TIME);
+    p.x += p.nudgeDir * NUDGE * cfg.laneWidth * Math.sin(Math.PI * p.nudgeT);
+  }
 
   // On the ground the runner rides the surface: up ramps, and falls when it drops away
   // (off the end of a roof, or sideways into a lane without a train).
