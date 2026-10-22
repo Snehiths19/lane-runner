@@ -26,7 +26,7 @@ How things look and sound (character, music, setting); swapping a skin never cha
 _Avoid_: theme (when it means rules)
 
 **Run**:
-One play from leaving the start screen until a crash.
+One play from leaving the start screen until the crash screen (a revived crash doesn't end it).
 _Avoid_: game, round, session
 
 **Run state**:
@@ -94,7 +94,7 @@ _Avoid_: high score, best distance
 ### Hits
 
 **Crash**:
-The end of a run, caused by a head-on hit or a second stumble.
+The hit that stops the runner (a head-on hit or a second stumble); it ends the run unless revived.
 _Avoid_: death, game over (as a term; fine as on-screen copy)
 
 **Head-on hit**:
@@ -104,7 +104,7 @@ The runner's hitbox meeting an obstacle coming toward it in the runner's own lan
 The runner's hitbox meeting an obstacle while changing lanes into it from the side. The runner bounces back to the lane they left.
 
 **Stumble**:
-The warning state after a side bump, lasting 5 seconds; a second side bump while stumbling is a crash.
+The warning state after a side bump, lasting a short window (Subway Surfers' length still to be measured); a second side bump while stumbling is a crash.
 
 **Section**:
 A short hand-made stretch of track (a few seconds long) with obstacles and coins placed in lanes; runs are built by chaining sections in random order.
@@ -146,5 +146,6 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 ## Flagged ambiguities
 
 - Swiping past the edge of the track: baseline (Subway Surfers) counts it as a **side bump** into the wall, so it stumbles. Snehith first chose "harmless", then chose the baseline; if wanted later, it becomes a **tweak**.
+- "crash" was first defined as the end of a run. Resolved: with **revive**, a **crash** is the stopping hit and the **run** ends at the **crash screen**.
 - "score" was first used to mean distance. Resolved: **score** is distance-based points × **score multiplier**; **distance** is just metres.
 - "train" could mean a **blocker** drawn as a train car or a train you can run on top of. Resolved: **trains** are rideable (baseline); **blockers** are walls you can only go around.
