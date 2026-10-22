@@ -28,8 +28,8 @@ rough values are marked as such and stay 🧪 until confirmed.
 | MOV-3 | Jump | Swipe up | air time ≈ 0.7 s (M, 2026-10-22) → gravity 36; height 🧪 | ✅ | |
 | MOV-4 | Roll | Swipe down; mid-air swipe down drops fast into a roll | roll time 🧪 (M) | ✅ | |
 | MOV-5 | Run speed | Starts at a base speed | base speed 🧪 (M) | ✅ | Run speed 20 (by feel, 2026-10-18) |
-| MOV-6 | Speed ramp | Speed rises gradually during a run | curve & cap 🧪 (M) | ⬜ | |
-| CAM-1 | Camera follow | Camera follows the surface height (ground/roof), rises with the runner during a jump and slides with lane changes, then settles | amount 🧪 (M) | ✅ surface follow (2b) · ⬜ jump/sideways (2d) | |
+| MOV-6 | Speed ramp | Speed rises gradually during a run | +60% evenly over 150 s, then holds 🧪 (M) | ✅ | |
+| CAM-1 | Camera follow | Camera follows the surface height (ground/roof), rises with the runner during a jump and slides with lane changes, then settles | lift 40% of jump, sideways lag 0.12 s 🧪 (M) | ✅ | |
 | MOV-7 | Edge swipe | Swiping into the wall at the track edge = side bump | nudge 0.3 lane over 0.25 s (our call) | ✅ | |
 
 ## M2 · Core loop (track, hits, chase, score)
@@ -45,15 +45,15 @@ CHS-2, CAM-1). Revive waits for keys in M4.
 | TRK-3 | Overhead bar | Roll under | — (WP) | ✅ | |
 | TRK-4 | Train without ramp (was "blocker") | Change lanes around it | — (WP: "poles, tunnel walls") | ✅ | |
 | TRK-5 | Parked train | Head-on = crash; can run on its roof | roof 3.6 m (our call) 🧪; length set per section | ✅ | |
-| TRK-6 | Moving train | Comes toward you; head-on = crash | train speed 🧪 (M) | ⬜ | |
+| TRK-6 | Moving train | Comes toward you; head-on = crash; no ramps | 10 m/s 🧪 (M); `M` in sections | ✅ | |
 | TRK-7 | Ramp | Slope at a train's back to run onto the roof | — (M) | ✅ | |
 | TRK-8 | Train roofs | Run on top of trains; jump between them; drop off the end | ground height logic | ✅ | |
-| TRK-9 | Tunnels | Track passes through tunnels (visual + walls) | — (WP) | ⬜ | |
+| TRK-9 | Tunnels | Track passes through tunnels (visual + walls) | 60 m every 400 m (our call); looks only | ✅ | |
 | HIT-1 | Head-on hit | Crash | — | ✅ | |
 | HIT-2 | Side bump | Bounce back to the lane you left, and stumble | — (G) | ✅ bounce (2b) · ✅ stumble (2c) | |
 | HIT-3 | Stumble | Inspector catches up; a second hit while stumbling = crash | window 3 s 🧪 (M); no slowdown | ✅ | |
 | CHS-1 | Inspector & dog | Chase you from the start, drop back, close in when you stumble, catch you on crash | close 2 s at start 🧪; gaps & speeds our calls; placeholder cutouts | ✅ | |
-| CHS-2 | Intro | Run starts with the character caught spraying graffiti, then chased; the runner opens with a leap over an oncoming train | — (WP, M) | ⬜ | |
+| CHS-2 | Intro | Run starts with the character caught spraying graffiti, then chased; the runner opens with a leap over an oncoming train | 5 m leap over a one-car moving train (our call) | ✅ leap · ⬜ graffiti scene (waits for art) | |
 | COI-1 | Coins on track | Lines and arcs of coins; high coins reached by jumping | — (WP) | ✅ | |
 | SCO-1 | Score | Score counts up with distance × score multiplier | ≈ 14.6 points/s at x1 at run start (M, 2026-10-22) | ✅ | |
 | SCO-2 | Best score | Highest score kept; "New best!" on crash screen; top 5 runs on this device | — | ✅ | |

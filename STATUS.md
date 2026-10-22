@@ -18,11 +18,12 @@ _Last updated: 2026-10-22._
 | M2 · 2a | Dodge & crash: sections, obstacles, coins, crash, score, crash card, top runs | ✅ accepted |
 | M2 · 2b | Trains: ramps, roofs, roof coins, roof hopping, side-bump bounce, surface camera | ✅ accepted |
 | M2 · 2c | Chase: stumble, inspector & dog, edge-swipe stumble | ✅ accepted |
-| **M2 · 2d** | **Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera** | **⏭ next** |
+| M2 · 2d | Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera | ✅ built, awaiting Snehith's check |
+| **M3** | **Power-ups** | **⏭ next** |
 | M3–M6 | Power-ups → hoverboard/keys/revive → progression/shop → events/world | ⬜ |
 | Personal | Music, Snehith's face, friend events, San Jose | ⬜ |
 
-Tests: 114 passing (`npm test`). Snehith's only tweak so far: run speed 20 (`src/rules/tweaks.js`).
+Tests: 134 passing (`npm test`). Snehith's only tweak so far: run speed 20 (`src/rules/tweaks.js`).
 
 ## How we work (Snehith's preferred process)
 
@@ -59,20 +60,31 @@ Snehith's acceptance check: (1) the inspector and dog are there at the start and
 ends the run and they grab you; (4) swiping into the wall at the edge counts as a bump; (5) it still
 feels fair on phone and PC.
 
-## Next: slice 2d, the alive world
+## Just built: slice 2d, the alive world
 
-FEATURES IDs: TRK-6 (moving trains), TRK-9 (tunnels), MOV-6 (speed ramp), CHS-2 (intro leap),
-CAM-1 (jump lift and sideways camera follow).
+Spec `docs/superpowers/specs/2026-10-22-m2d-alive-world-design.md`, plan
+`docs/superpowers/plans/2026-10-22-m2d-alive-world.md`. Moving trains (`M` in sections, `track.move`),
+speed ramp (`speedAt`, `game.time`), intro leap (`startIntro`, `track.addIntroTrain`), tunnels
+(`src/tunnels.js`, looks only), camera follow (`followCamera`). Also fixed: at high speed a runner
+could be lifted onto a train roof instead of crashing into its front (`groundHeightAt` now takes the
+runner's height and last distance).
 
-Snehith usually accepts every grill recommendation: take the recommended answers, record them in
-`CONTEXT.md` and the design doc, list them in the summary, and keep building.
+Snehith's acceptance check: (1) the run opens with a leap over a train; (2) some trains drive at you
+and feel fair to dodge; (3) the game gets faster the longer you run; (4) tunnels pass by; (5) the
+camera feels alive on jumps and lane changes without making you dizzy.
 
-Open questions for the 2d grill (suggested order):
-1. How fast moving trains come at you and how often they appear in sections.
-2. Speed ramp: how fast speed rises and where it caps (measure from Poki 🧪).
-3. Intro: how much of the graffiti scene to copy before the leap, and whether a tap skips it.
-4. Tunnels: looks only, or also walls that block lane changes.
-5. Camera: how much it lifts on jumps and slides with lane changes.
+## Next: M3, power-ups
+
+FEATURES IDs: PWR-1 to PWR-7 (magnet, jetpack, super sneakers, 2X multiplier, pogo stick, timer
+overlap, mystery box). Snehith usually accepts every grill recommendation: take the recommended answers,
+record them in `CONTEXT.md` and the design doc, list them in the summary, and keep building.
+
+Open questions for the M3 grill (suggested order):
+1. Split M3 into slices (e.g. 3a magnet + 2X, 3b sneakers + jetpack, 3c pogo + mystery box)?
+2. How power-ups appear in sections (a new symbol) and how often.
+3. Base durations before upgrades (🧪, measure from Poki).
+4. Jetpack: coin trail height and how landing works over trains.
+5. On-screen timer look for active power-ups.
 
 Cloud-session browser checks: jsdelivr (the three.js CDN) is blocked by the cloud proxy. Get three
 from npm (`npm pack three@0.160.0`) and serve it to the page with Playwright `page.route`; use the
