@@ -40,24 +40,24 @@ CHS-2, CAM-1). Revive waits for keys in M4.
 
 | ID | Feature | Baseline | Numbers (source) | Status | Your tweak |
 |---|---|---|---|---|---|
-| TRK-1 | Sections | Track built from hand-made sections chained at random (ADR 0001) | 5 m rows (our call) | 🔨 | |
-| TRK-2 | Low barrier | Jump over | — (WP) | 🔨 | |
-| TRK-3 | Overhead bar | Roll under | — (WP) | 🔨 | |
-| TRK-4 | Blocker / wall | Change lanes around it | — (WP: "poles, tunnel walls") | 🔨 | |
+| TRK-1 | Sections | Track built from hand-made sections chained at random (ADR 0001) | 5 m rows (our call) | ✅ | |
+| TRK-2 | Low barrier | Jump over | — (WP) | ✅ | |
+| TRK-3 | Overhead bar | Roll under | — (WP) | ✅ | |
+| TRK-4 | Blocker / wall | Change lanes around it (2a: any touch crashes; side bumps in 2c) | — (WP: "poles, tunnel walls") | ✅ | |
 | TRK-5 | Parked train | Head-on = crash; can run on its roof | train length 🧪 (M) | 🔨 | |
 | TRK-6 | Moving train | Comes toward you; head-on = crash | train speed 🧪 (M) | ⬜ | |
 | TRK-7 | Ramp | Slope at a train's back to run onto the roof | — (M) | 🔨 | |
 | TRK-8 | Train roofs | Run on top of trains; jump between them; drop off the end | ground height logic | 🔨 | |
 | TRK-9 | Tunnels | Track passes through tunnels (visual + walls) | — (WP) | ⬜ | |
-| HIT-1 | Head-on hit | Crash | — | 🔨 | |
+| HIT-1 | Head-on hit | Crash | — | ✅ | |
 | HIT-2 | Side bump | Bounce back to the lane you left, and stumble | — (G) | 🔨 | |
 | HIT-3 | Stumble | Inspector catches up; a second hit while stumbling = crash | window length 🧪 (M) | 🔨 | |
 | CHS-1 | Inspector & dog | Chase you from the start, drop back, close in when you stumble, catch you on crash | — (WP) | 🔨 | |
 | CHS-2 | Intro | Run starts with the character caught spraying graffiti, then chased; the runner opens with a leap over an oncoming train | — (WP, M) | ⬜ | |
-| COI-1 | Coins on track | Lines and arcs of coins; high coins reached by jumping | — (WP) | 🔨 | |
-| SCO-1 | Score | Score counts up with distance × score multiplier | ≈ 14.6 points/s at x1 at run start (M, 2026-10-22) | 🔨 | |
-| SCO-2 | Best score | Highest score kept; "New best!" on crash screen | — | 🔨 | |
-| RUN-1 | Crash screen | Notebook-style card: character, score, coins, keys & coin totals, leaderboard; buttons Menu / Boosts / PLAY (web: "Double Up" coins for an ad) | — (M) | 🔨 | Ads ➖ |
+| COI-1 | Coins on track | Lines and arcs of coins; high coins reached by jumping | — (WP) | ✅ | |
+| SCO-1 | Score | Score counts up with distance × score multiplier | ≈ 14.6 points/s at x1 at run start (M, 2026-10-22) | ✅ | |
+| SCO-2 | Best score | Highest score kept; "New best!" on crash screen; top 5 runs on this device | — | ✅ | |
+| RUN-1 | Crash screen | Notebook-style card: character, score, coins, keys & coin totals, leaderboard; buttons Menu / Boosts / PLAY (web: "Double Up" coins for an ad) | — (M) | ✅ | Ads ➖ |
 
 ## M3 · Power-ups (picked up on the track)
 

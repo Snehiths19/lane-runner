@@ -14,6 +14,18 @@ Runs on PC (keyboard) and phone (swipe). No install needed — open the hosted p
 | Jump | ↑, W or Space | Swipe up |
 | Slide | ↓ or S | Swipe down (mid-air: drop fast, then slide) |
 
+## Playing
+
+Dodge **low barriers** (jump), **overhead bars** (roll) and **blockers** (change lanes); grab coins,
+including high ones you have to jump for. Running into anything ends the run; the score card shows
+your score, best score and your top 5 runs on this device. Tap PLAY (or Space) to go again.
+
+## Designing track sections
+
+The track is built from hand-made sections in [`sections.txt`](sections.txt): little text pictures
+you can edit on GitHub, even from your phone. The legend is at the top of the file. If a section has
+a mistake, the game says which section and line instead of starting.
+
 ## Tuning the feel
 
 Tap ⚙️ to open the sliders (on a phone the run pauses while it's open). Changes apply instantly

@@ -22,7 +22,14 @@ and makes gameplay/design decisions. Present those decisions as plain-language c
   fingerprint, slider ranges), `src/tuning.js`
   (saved tweaks), `src/player.js` (movement + hitbox), `src/game-state.js` (start/running/paused),
   `src/input.js` (`classifySwipe`, `keyToAction`), `src/view.js` (camera fit).
-- Browser-only, verified by playing: `src/world.js` (Three.js scene), `src/panel.js`, `src/main.js`.
+- Track & run (pure, tested): `src/sections.js` (parse/validate section maps), `src/track.js` (chain
+  sections into items by distance), `src/hits.js` (hitbox overlaps → crash / coins), `src/ground.js`
+  (the only source of ground height), `src/runs.js` (best score + top runs, key `lane-runner.runs`).
+- `sections.txt` (repo root): the hand-made sections. Snehith may edit it; the tests and the page both
+  reject mistakes with the section name and line.
+- Browser-only, verified by playing: `src/world.js` (Three.js scene + item models), `src/panel.js`,
+  `src/main.js` (loop, crash flow, HUD, crash screen). `window.__laneRunner` exposes
+  `{ game, player, cfg, track }`.
 - **To make pasted "Copy settings" values permanent:** put only the values that differ from
   `BASELINE.movement` into `TWEAKS.movement` in `src/rules/tweaks.js` (with a dated comment), and note
   the tweak in FEATURES.md's *Your tweak* column. The fingerprint changes automatically.
@@ -32,7 +39,6 @@ and makes gameplay/design decisions. Present those decisions as plain-language c
 ## Commands
 - `npm test` — run unit tests (Node built-in runner). Only commit when it reports `fail 0`.
 - `npm run serve` — local server on http://localhost:8080 for browser checks (Playwright).
-  `window.__laneRunner` exposes `{ game, player, cfg }` for checks.
 
 ## Workflow
 - GitHub repo `Snehiths19/lane-runner` (public) is the cloud copy; GitHub Pages hosts the game.
