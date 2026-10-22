@@ -6,8 +6,10 @@ import { hitbox, laneX } from './player.js';
 const RUNNER_DEPTH = 0.6;
 
 // Height range [bottom, top] of each kind of item, above the surface it sits on (item.base).
-// A train is solid up to its roof, so a runner standing on the roof is safe.
-const height = (kind, cfg) => ({ low: [0, 0.8], over: [1.0, 3.0], train: [0, cfg.roofHeight], coin: [0.3, 1.3], highcoin: [2.0, 3.0] })[kind];
+// A train is solid up to just under its roof: a runner standing on the roof is safe, and so is one
+// stepping off the top of a ramp (their front reaches the train a moment before their feet do).
+const STEP_UP = 0.5;
+const height = (kind, cfg) => ({ low: [0, 0.8], over: [1.0, 3.0], train: [0, cfg.roofHeight - STEP_UP], coin: [0.3, 1.3], highcoin: [2.0, 3.0] })[kind];
 // Width of each kind, as a share of the lane (obstacles) or in metres (coins).
 const isCoin = (kind) => kind === 'coin' || kind === 'highcoin';
 const width = (kind, cfg) => (isCoin(kind) ? 0.6 : 0.8 * cfg.laneWidth);

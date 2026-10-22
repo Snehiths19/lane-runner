@@ -203,3 +203,16 @@ test('bounceBack returns to the lane left, keeping height', () => {
   step(p, cfg.laneSwitchTime);
   assert.ok(Math.abs(p.x) < 1e-9, 'back in the middle lane');
 });
+
+test('a bounce in progress ignores further bumps until it finishes', () => {
+  const p = createPlayer();
+  handleAction(p, 'right', cfg);
+  step(p, 0.05);
+  bounceBack(p);
+  bounceBack(p); // still touching the train next frame
+  assert.equal(p.lane, 1, 'keeps heading back, no flip-flop');
+  step(p, cfg.laneSwitchTime);
+  handleAction(p, 'right', cfg);
+  bounceBack(p);
+  assert.equal(p.lane, 1, 'a new bump after the bounce finished works again');
+});

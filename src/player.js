@@ -7,6 +7,7 @@ export function createPlayer() {
     x: 0,
     fromX: 0,   // x where the current lane switch started
     fromLane: 1, // lane the current switch left (for bouncing back)
+    bouncing: false, // heading back after a side bump
     switchT: 1, // 0..1 progress of the current lane switch (1 = done)
     y: 0,
     vy: 0,
@@ -54,6 +55,8 @@ export function handleAction(p, action, cfg) {
 // Side bump: head back to the lane the runner just left, from wherever they are now
 // (CONTEXT.md: a lane change remembers the lane it left).
 export function bounceBack(p) {
+  if (p.bouncing) return; // already heading back; still touching the obstacle is expected
+  p.bouncing = true;
   [p.lane, p.fromLane] = [p.fromLane, p.lane];
   p.fromX = p.x;
   p.switchT = 0;
@@ -68,6 +71,7 @@ const easeOut = (t) => 1 - (1 - t) * (1 - t);
 // groundY: ground height under the runner (CONTEXT: ground height comes from one place).
 export function updatePlayer(p, dt, cfg, groundY = 0) {
   if (p.switchT < 1) p.switchT = Math.min(1, p.switchT + dt / cfg.laneSwitchTime);
+  if (p.switchT === 1) p.bouncing = false;
   p.x = p.fromX + (laneX(p.lane, cfg) - p.fromX) * easeOut(p.switchT);
 
   // On the ground the runner rides the surface: up ramps, and falls when it drops away

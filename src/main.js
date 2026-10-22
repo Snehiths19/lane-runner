@@ -1,7 +1,7 @@
 // Wires the pure game modules to the page and runs the animation loop.
 
 import { createWorld } from './world.js';
-import { createPlayer, handleAction, updatePlayer } from './player.js';
+import { createPlayer, handleAction, updatePlayer, bounceBack } from './player.js';
 import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score } from './game-state.js';
 import { attachInput } from './input.js';
 import { loadTuning, saveTuning, settingsText } from './tuning.js';
@@ -140,12 +140,17 @@ function frame(nowMs) {
 
   if (game.runId !== runId) { runId = game.runId; newRun(); }
 
+  // Rules that need world sizes as well as the slider values.
+  const worldCfg = { ...cfg, roofHeight: RULES.track.roofHeight };
+  const prevDistance = game.distance;
   const runDt = advance(game, dt, cfg.runSpeed);
-  updatePlayer(player, runDt, cfg, groundHeightAt(player.lane, game.distance, track.items));
+  const groundY = groundHeightAt(player.x, game.distance, track.items, worldCfg);
+  updatePlayer(player, runDt, cfg, groundY);
   if (game.state === 'running') {
     track.fill(game.distance + 150);
     track.dropBefore(game.distance - 10);
-    const hits = checkHits(player, track.items, game.distance, cfg);
+    const hits = checkHits(player, track.items, game.distance, worldCfg, prevDistance);
+    if (hits.sideBump && !hits.crash) bounceBack(player);
     if (hits.coins.length) {
       game.coins += hits.coins.length;
       const taken = new Set(hits.coins);
@@ -157,7 +162,7 @@ function frame(nowMs) {
     showCrashScreen();
   }
 
-  world.update(cfg.runSpeed * runDt, player, cfg, track.items, game.distance, now);
+  world.update(cfg.runSpeed * runDt, player, cfg, track.items, game.distance, now, groundY, dt);
   scoreEl.textContent = pad(score(game, RULES));
   coinsEl.textContent = String(game.coins);
   requestAnimationFrame(frame);

@@ -120,3 +120,10 @@ test('touching something alongside without changing lanes is a crash, not a boun
   const barrier = at('low', 1, 0.4);
   assert.equal(checkHits(p, [barrier], 100, cfg, 99.9).crash, true);
 });
+
+test('running off the top of a ramp onto the roof is not a crash', () => {
+  const p = createPlayer();
+  p.y = 3.38; // last bit of the ramp, runner's front already at the train's front
+  const train = { ...at('train', 1, 20), start: 100.2, end: 120.2 };
+  assert.equal(checkHits(p, [train], 100, cfg, 99.8).crash, false);
+});

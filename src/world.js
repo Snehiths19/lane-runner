@@ -3,6 +3,10 @@
 
 import * as THREE from 'three';
 import { fovForAspect } from './view.js';
+import { RULES } from './rules/index.js';
+
+const ROOF = RULES.track.roofHeight;
+const RAMP_LENGTH = RULES.track.rowLength;
 import { isSliding, laneX } from './player.js';
 
 const TILE_LENGTH = 20;
@@ -97,6 +101,7 @@ function buildItemFactory() {
     train: new THREE.MeshLambertMaterial({ color: 0x8d99a6 }),
     roof: new THREE.MeshLambertMaterial({ color: 0x5f6b77 }),
     window: new THREE.MeshLambertMaterial({ color: 0x2b3a4a }),
+    ramp: new THREE.MeshLambertMaterial({ color: 0xb08a5a }),
     coin: new THREE.MeshLambertMaterial({ color: 0xffc31a, emissive: 0xa86f00 }),
   };
   const box = (w, h, d, mat, y) => {
@@ -119,10 +124,17 @@ function buildItemFactory() {
       body.add(box(0.06, 1.8, 0.06, m.post, 0.9).translateX(-0.42), box(0.06, 1.8, 0.06, m.post, 0.9).translateX(0.42));
     } else if (kind === 'train') {
       // A train car; its length is set per item.
-      body.add(box(0.8, 3.4, 1, m.train, 1.7), box(0.84, 0.3, 1, m.roof, 3.55));
+      // Body plus a darker roof whose top is exactly the runnable roof height.
+      body.add(box(0.8, ROOF - 0.3, 1, m.train, (ROOF - 0.3) / 2), box(0.84, 0.3, 1, m.roof, ROOF - 0.15));
       const win = box(0.82, 0.7, 1, m.window, 2.3);
       win.scale.z = 0.9;
       body.add(win);
+    } else if (kind === 'ramp') {
+      // A plank rising from the track (near end) to the roof (far end).
+      const slope = Math.atan2(ROOF, RAMP_LENGTH);
+      const plank = box(0.8, 0.15, Math.hypot(ROOF, RAMP_LENGTH), m.ramp, ROOF / 2);
+      plank.rotation.x = slope;
+      body.add(plank);
     } else {
       const coin = new THREE.Mesh(coinGeo, m.coin);
       coin.position.y = kind === 'highcoin' ? 2.5 : 0.8;
@@ -206,7 +218,7 @@ export function createWorld(canvas) {
         itemLayer.add(mesh);
       }
       mesh.userData.body.scale.x = cfg.laneWidth;
-      mesh.position.set(laneX(item.lane, cfg), 0, -((item.start + item.end) / 2 - distance));
+      mesh.position.set(laneX(item.lane, cfg), item.base ?? 0, -((item.start + item.end) / 2 - distance));
       if (mesh.userData.coin) mesh.userData.coin.rotation.y = time * 3;
     }
     for (const [id, mesh] of itemMeshes) {
@@ -222,7 +234,10 @@ export function createWorld(canvas) {
 
   // scroll: how far the world moved this frame (0 while not running).
   // items/distance: what's on the track and how far the runner has gone; time: seconds, for coin spin.
-  function update(scroll, player, cfg, items = [], distance = 0, time = 0) {
+  // groundY: surface height under the runner (track or roof); the camera follows it smoothly.
+  let cameraSurface = 0;
+  function update(scroll, player, cfg, items = [], distance = 0, time = 0, groundY = 0, dt = 0) {
+    cameraSurface += (groundY - cameraSurface) * Math.min(1, dt / 0.25 * 3);
     syncItems(items, distance, cfg, time);
     if (cfg.laneWidth !== laneWidth) {
       laneWidth = cfg.laneWidth;
@@ -245,10 +260,11 @@ export function createWorld(canvas) {
     runner.position.set(player.x, player.y, knockBack);
     runner.scale.y = isSliding(player) ? 0.5 : 1;
     shadow.position.x = player.x;
-    shadow.scale.setScalar(1 - Math.min(player.y / 5, 0.6));
+    shadow.position.y = groundY + 0.03;
+    shadow.scale.setScalar(1 - Math.min((player.y - groundY) / 5, 0.6));
 
-    camera.position.set(player.x * 0.5, 3.6, 6);
-    camera.lookAt(player.x * 0.5, 1.4, -12);
+    camera.position.set(player.x * 0.5, 3.6 + cameraSurface, 6);
+    camera.lookAt(player.x * 0.5, 1.4 + cameraSurface, -12);
     // Cutouts always face the camera, turning only around the vertical axis.
     runner.rotation.y = Math.atan2(camera.position.x - runner.position.x, camera.position.z);
 
