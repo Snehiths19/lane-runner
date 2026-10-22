@@ -53,14 +53,12 @@ A knee-high obstacle passed by jumping over it.
 **Overhead bar**:
 A head-height obstacle passed by sliding under it.
 
-**Blocker**:
-A full-height obstacle passed only by changing lanes.
-
 **Train**:
-A train car on a lane, parked or moving toward the runner; its front is a head-on hit, its roof can be run on, reached by a **ramp**.
+The full-height obstacle: one or more train cars in a lane, parked or (later) moving toward the runner. Its front is a **head-on hit**; without a **ramp** it's passed by changing lanes; its roof can be run on.
+_Avoid_: blocker, wall (walls and poles are separate kinds, later)
 
 **Ramp**:
-A slope at the back of a train that lets the runner run up onto the roof.
+A slope at the near end of a train (the end the runner meets first) that lets the runner run up onto the roof.
 
 ### Scoring
 
@@ -129,7 +127,7 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 - A **Run** moves through **run states**: start → running ⇄ paused → crashed → (revive → running) or crash screen → (tap) a new run. The title (start) screen only appears when the game is first opened.
 - Every **obstacle**, coin and **friend event** sits in exactly one **lane** at a distance along the track.
 - A **run** is an endless chain of **sections**; each **section** holds obstacles and coins (later also friend events).
-- Each **obstacle** kind is beaten by exactly one move: **low barrier** → jump, **overhead bar** → slide, **blocker** → lane change.
+- Each **obstacle** kind is beaten by one move: **low barrier** → jump, **overhead bar** → roll, **train** → lane change, or running up its **ramp** when it has one.
 
 ## Invariants
 
@@ -144,12 +142,12 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 
 ## Example dialogue
 
-> **Dev:** "If the **runner** is mid-jump when a **blocker** comes up in their **lane**, can they clear it?"
-> **Snehith:** "No. A **blocker** is full height; only changing **lane** gets you past it. Jumping is for **low barriers**."
+> **Dev:** "If the **runner** is mid-jump when a **train** comes up in their **lane**, can they clear it?"
+> **Snehith:** "No. A **train** is too tall to jump onto. Change **lane**, or if it has a **ramp**, run up the ramp onto the roof. Jumping is for **low barriers**."
 
 ## Flagged ambiguities
 
 - Swiping past the edge of the track: baseline (Subway Surfers) counts it as a **side bump** into the wall, so it stumbles. Snehith first chose "harmless", then chose the baseline; if wanted later, it becomes a **tweak**.
 - "crash" was first defined as the end of a run. Resolved: with **revive**, a **crash** is the stopping hit and the **run** ends at the **crash screen**.
 - "score" was first used to mean distance. Resolved: **score** is distance-based points × **score multiplier**; **distance** is just metres.
-- "train" could mean a **blocker** drawn as a train car or a train you can run on top of. Resolved: **trains** are rideable (baseline); **blockers** are walls you can only go around.
+- "blocker" and "train" were two terms for the same grey train car. Resolved (2026-10-22): one concept, **train**; a ramp makes it climbable. Non-train walls and poles are separate kinds, added later.
