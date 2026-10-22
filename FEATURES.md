@@ -34,6 +34,10 @@ rough values are marked as such and stay 🧪 until confirmed.
 
 ## M2 · Core loop (track, hits, chase, score)
 
+Built in four playable slices, in order: **2a Dodge & crash** (TRK-1–4, HIT-1, COI-1, SCO-1–2, RUN-1) →
+**2b Trains** (TRK-5, 7, 8) → **2c Chase** (HIT-2–3, CHS-1, MOV-7) → **2d Alive world** (TRK-6, 9, MOV-6,
+CHS-2, CAM-1). Revive waits for keys in M4.
+
 | ID | Feature | Baseline | Numbers (source) | Status | Your tweak |
 |---|---|---|---|---|---|
 | TRK-1 | Sections | Track built from hand-made sections chained at random (ADR 0001) | 5 m rows (our call) | 🔨 | |
