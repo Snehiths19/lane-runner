@@ -50,7 +50,7 @@ test('never the same section twice in a row', () => {
   assert.ok(!kinds.includes('coin,coin,coin'), 'coin section repeated');
 });
 
-test('stacked B rows become one block', () => {
+test('stacked B rows become one train', () => {
   const [wall] = parseSections(`name: wall
 . . .
 B . .
@@ -59,10 +59,10 @@ B . .
 . . .`);
   const track = createTrack([wall], opts, seeded());
   track.fill(36 + 25);
-  const blocks = track.items.filter((i) => i.kind === 'block');
-  assert.equal(blocks.length, 1);
-  assert.equal(blocks[0].lane, 0);
-  assert.equal(blocks[0].end - blocks[0].start, 15);
+  const trains = track.items.filter((i) => i.kind === 'train');
+  assert.equal(trains.length, 1);
+  assert.equal(trains[0].lane, 0);
+  assert.equal(trains[0].end - trains[0].start, 15);
 });
 
 test('drops passed items', () => {

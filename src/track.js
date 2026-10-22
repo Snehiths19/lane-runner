@@ -1,7 +1,7 @@
 // The endless track: sections chained one after another, as items placed by distance.
 // An item is { id, kind, lane, start, end }; start/end are metres from the run's start.
 
-const KIND = { L: 'low', O: 'over', B: 'block', c: 'coin', '^': 'highcoin' };
+const KIND = { L: 'low', O: 'over', B: 'train', c: 'coin', '^': 'highcoin' };
 const DEPTH = { low: 0.4, over: 0.4, coin: 0.6, highcoin: 0.6 };
 
 export function createTrack(sections, { rowLength, startClear }, random = Math.random) {
@@ -12,17 +12,17 @@ export function createTrack(sections, { rowLength, startClear }, random = Math.r
 
   function place(section, offset) {
     const added = [];
-    const openBlock = [null, null, null]; // a blocker still growing in each lane
+    const openTrain = [null, null, null]; // a train still growing in each lane
     section.rows.forEach((row, r) => {
       const rowStart = offset + r * rowLength;
       const centre = rowStart + rowLength / 2;
       row.forEach((cell, lane) => {
         if (cell.obstacle === 'B') {
-          // Stacked B rows form one long blocker.
-          if (openBlock[lane]) openBlock[lane].end = rowStart + rowLength;
-          else added.push(openBlock[lane] = { id: nextId++, kind: 'block', lane, start: rowStart, end: rowStart + rowLength });
+          // Stacked B rows form one long train.
+          if (openTrain[lane]) openTrain[lane].end = rowStart + rowLength;
+          else added.push(openTrain[lane] = { id: nextId++, kind: 'train', lane, start: rowStart, end: rowStart + rowLength });
         } else {
-          openBlock[lane] = null;
+          openTrain[lane] = null;
         }
         for (const symbol of [cell.obstacle, cell.coin]) {
           if (!symbol || symbol === 'B') continue;

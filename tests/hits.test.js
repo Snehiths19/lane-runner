@@ -7,7 +7,7 @@ import { checkHits } from '../src/hits.js';
 const cfg = { ...DEFAULTS };
 let id = 0;
 // An item right where the runner is (distance 100), in the given lane.
-const at = (kind, lane = 1, depth = kind === 'block' ? 10 : 0.4) =>
+const at = (kind, lane = 1, depth = kind === 'train' ? 10 : 0.4) =>
   ({ id: ++id, kind, lane, start: 100 - depth / 2, end: 100 + depth / 2 });
 
 test('running into a low barrier crashes', () => {
@@ -24,7 +24,7 @@ test('jumping over a low barrier is safe', () => {
 
 test('an obstacle in another lane is ignored', () => {
   const p = createPlayer();
-  assert.equal(checkHits(p, [at('low', 0), at('block', 2)], 100, cfg).crash, false);
+  assert.equal(checkHits(p, [at('low', 0), at('train', 2)], 100, cfg).crash, false);
 });
 
 test('standing into an overhead bar crashes; rolling under it is safe', () => {
@@ -34,11 +34,11 @@ test('standing into an overhead bar crashes; rolling under it is safe', () => {
   assert.equal(checkHits(p, [at('over')], 100, cfg).crash, false);
 });
 
-test('a blocker crashes even at the top of a jump', () => {
+test('a train crashes even at the top of a jump', () => {
   const p = createPlayer();
   handleAction(p, 'jump', cfg);
   p.y = cfg.jumpHeight;
-  assert.equal(checkHits(p, [at('block')], 100, cfg).crash, true);
+  assert.equal(checkHits(p, [at('train')], 100, cfg).crash, true);
 });
 
 test('a coin in the lane is collected, not a crash', () => {

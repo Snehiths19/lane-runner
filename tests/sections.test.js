@@ -76,9 +76,9 @@ test('rejects a section whose first or last row is not clear', () => {
 c . .`), /opennear.*first and last rows must be clear/);
 });
 
-test('rejects a coin inside a blocker', () => {
+test('rejects a coin inside a train', () => {
   assert.throws(() => parseSections(`name: buried
 . . .
 . Bc .
-. . .`), /buried.*line 3.*coin inside a blocker/);
+. . .`), /buried.*line 3.*coin inside a train/);
 });

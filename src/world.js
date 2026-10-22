@@ -117,8 +117,8 @@ function buildItemFactory() {
     } else if (kind === 'over') {
       body.add(box(0.8, 0.8, 0.15, m.sign, 1.4));
       body.add(box(0.06, 1.8, 0.06, m.post, 0.9).translateX(-0.42), box(0.06, 1.8, 0.06, m.post, 0.9).translateX(0.42));
-    } else if (kind === 'block') {
-      // A train-car-like box; depth is set per item.
+    } else if (kind === 'train') {
+      // A train car; its length is set per item.
       body.add(box(0.8, 3.4, 1, m.train, 1.7), box(0.84, 0.3, 1, m.roof, 3.55));
       const win = box(0.82, 0.7, 1, m.window, 2.3);
       win.scale.z = 0.9;
@@ -201,7 +201,7 @@ export function createWorld(canvas) {
       let mesh = itemMeshes.get(item.id);
       if (!mesh) {
         mesh = buildItem(item.kind);
-        if (item.kind === 'block') mesh.userData.body.scale.z = item.end - item.start;
+        if (item.kind === 'train') mesh.userData.body.scale.z = item.end - item.start;
         itemMeshes.set(item.id, mesh);
         itemLayer.add(mesh);
       }

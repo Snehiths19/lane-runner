@@ -3,7 +3,7 @@
 // cells (left, middle, right). The bottom line is the nearest row, so rows come out near → far.
 // Mistakes throw with the section name and line number, so a typo can't slip into the game.
 
-const OBSTACLES = ['L', 'O', 'B']; // low barrier, overhead bar, blocker
+const OBSTACLES = ['L', 'O', 'B']; // low barrier, overhead bar, train
 const COINS = ['c', '^'];          // coin, high coin
 
 function parseCell(token, where) {
@@ -14,7 +14,7 @@ function parseCell(token, where) {
     else if (COINS.includes(ch)) cell.coin = ch;
     else throw new Error(`${where}: unknown symbol "${ch}"`);
   }
-  if (cell.obstacle === 'B' && cell.coin) throw new Error(`${where}: coin inside a blocker`);
+  if (cell.obstacle === 'B' && cell.coin) throw new Error(`${where}: coin inside a train`);
   return cell;
 }
 

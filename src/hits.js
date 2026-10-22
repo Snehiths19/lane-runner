@@ -6,7 +6,7 @@ import { hitbox, laneX } from './player.js';
 const RUNNER_DEPTH = 0.6;
 
 // Height range [bottom, top] of each kind of item.
-const HEIGHT = { low: [0, 0.8], over: [1.0, 3.0], block: [0, 4], coin: [0.3, 1.3], highcoin: [2.0, 3.0] };
+const HEIGHT = { low: [0, 0.8], over: [1.0, 3.0], train: [0, 4], coin: [0.3, 1.3], highcoin: [2.0, 3.0] };
 // Width of each kind, as a share of the lane (obstacles) or in metres (coins).
 const isCoin = (kind) => kind === 'coin' || kind === 'highcoin';
 const width = (kind, cfg) => (isCoin(kind) ? 0.6 : 0.8 * cfg.laneWidth);
