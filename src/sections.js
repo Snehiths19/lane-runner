@@ -3,7 +3,7 @@
 // cells (left, middle, right). The bottom line is the nearest row, so rows come out near → far.
 // Mistakes throw with the section name and line number, so a typo can't slip into the game.
 
-const OBSTACLES = ['L', 'O', 'B', 'R']; // low barrier, overhead bar, train, ramp
+const OBSTACLES = ['L', 'O', 'B', 'R', 'M']; // low barrier, overhead bar, train, ramp, moving train
 const COINS = ['c', '^'];          // coin, high coin
 
 function parseCell(token, where) {
@@ -47,6 +47,20 @@ export function parseSections(text) {
         throw new Error(`Section "${s.name}", line ${lines[r]}: a ramp must lead onto a train (put B on the line above it)`);
       }
     }));
+    // A moving train drives through its lane, so nothing may sit beyond it in this section; that way
+    // it meets the runner where the map shows it (CONTEXT.md: Moving train).
+    for (let lane = 0; lane < 3; lane++) {
+      const first = s.rows.findIndex((row) => row[lane].obstacle === 'M');
+      if (first < 0) continue;
+      let r = first;
+      while (s.rows[r + 1]?.[lane].obstacle === 'M') r++;
+      for (r += 1; r < s.rows.length; r++) {
+        const cell = s.rows[r][lane];
+        if (cell.obstacle || cell.coin) {
+          throw new Error(`Section "${s.name}", line ${lines[r]}: a moving train's lane must be empty beyond it`);
+        }
+      }
+    }
     // Any two sections must be able to follow each other (CONTEXT.md invariant).
     const clear = (row) => row.every((c) => !c.obstacle && !c.coin);
     if (!s.rows.length || !clear(s.rows[0]) || !clear(s.rows.at(-1))) {
