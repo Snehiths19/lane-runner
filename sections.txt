@@ -161,3 +161,14 @@ M . M
 . c .
 . . .
 . . .
+
+name: dodgeright
+. . .
+. . .
+. . M
+. . M
+c . M
+c . .
+c L .
+c . .
+. . .
