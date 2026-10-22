@@ -1,0 +1,90 @@
+# Lane Runner sections — hand-made stretches of track (see CONTEXT.md and ADR 0001).
+#
+# Read each picture like looking down the track: the BOTTOM line is closest to you.
+# Three columns = left, middle, right lane. One line = 5 metres of track.
+#
+#   .   empty            L   low barrier (jump over)     c   coin
+#   B   blocker (go round; stacked B's make one long one) O   overhead bar (roll under)
+#   ^   high coin (jump to collect)                       L^  low barrier with a high coin above
+#
+# Rules (the tests check these): every section starts and ends with an empty line,
+# every line has exactly 3 cells, and no line blocks all three lanes with B.
+
+name: hop
+. . .
+. c .
+. ^ .
+. L^ .
+. ^ .
+. c .
+. . .
+
+name: duck
+. . .
+c . .
+c O O
+c . .
+c . .
+. . .
+
+name: zigzag
+. . .
+. . c
+B B c
+B B .
+. . .
+c . .
+c B B
+. B B
+. . .
+. . .
+
+name: coinline
+. . .
+c . .
+c . .
+c L .
+c . .
+c . .
+. . .
+
+name: hurdles
+. . .
+. c .
+L L L
+. . .
+. . .
+. ^ .
+L L^ L
+. ^ .
+. . .
+. . .
+
+name: gates
+. . .
+O O O
+. . .
+. . .
+c c c
+. . .
+. . .
+
+name: choices
+. . .
+. c .
+. c .
+L O B
+. . B
+. . .
+. . .
+
+name: corridor
+. . .
+. . .
+B O B
+B . B
+B c B
+B c B
+B c B
+. . .
+. . .

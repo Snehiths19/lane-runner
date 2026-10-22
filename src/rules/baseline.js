@@ -13,4 +13,14 @@ export const BASELINE = {
     slideTime: 0.6,       // MOV-4 🧪 seconds a roll lasts
     fastFallSpeed: 30,    // MOV-4 🧪 downward speed when swiping down mid-air
   },
+  track: {
+    rowLength: 5,         // TRK-1 metres per section-map line (our call)
+    startClear: 36,       // CHS-2 empty track at run start until the intro leap exists (our call)
+  },
+  scoring: {
+    pointsPerMetre: 14.6 / 12, // SCO-1 ≈14.6 points/s at x1 measured 2026-10-22, ÷ baseline run speed
+  },
+  crash: {
+    screenDelay: 1.0,     // RUN-1 🧪 seconds from crash to crash screen
+  },
 };
