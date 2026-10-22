@@ -2,7 +2,7 @@
 
 import { createWorld } from './world.js';
 import { createPlayer, handleAction, updatePlayer, bounceBack, startIntro } from './player.js';
-import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score, speedAt } from './game-state.js';
+import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score, speedAt, substeps } from './game-state.js';
 import { attachInput } from './input.js';
 import { loadTuning, saveTuning, settingsText } from './tuning.js';
 import { buildPanel } from './panel.js';
@@ -159,10 +159,34 @@ function frame(nowMs) {
 
   if (game.runId !== runId) { runId = game.runId; newRun(); }
 
+  // At high speed one frame can carry the runner past a whole barrier, so a frame runs in small
+  // steps and each step checks hits.
+  const speed = speedAt(game.time, cfg.runSpeed, RULES.speedRamp);
+  const steps = substeps(dt, speed);
+  let scroll = 0;
+  let groundY = 0;
+  for (let i = 0; i < steps; i++) {
+    const step = runStep(dt / steps, speed, now);
+    scroll += step.scroll;
+    groundY = step.groundY;
+  }
+  // The chase runs with the run, and keeps going after a crash for the catch.
+  updateChase(chase, game.state === 'running' || game.state === 'crashed' ? dt : 0, RULES.chase);
+  if (game.state === 'crashed' && crashScreen.hidden && crashScreenReady(game, now, RULES.crash.screenDelay)) {
+    showCrashScreen();
+  }
+
+  world.update(scroll, player, cfg, track.items, game.distance, now, groundY, dt, chase.gap);
+  scoreEl.textContent = pad(score(game, RULES));
+  coinsEl.textContent = String(game.coins);
+  requestAnimationFrame(frame);
+}
+
+// One step of the run: move, follow the ground, check hits. Returns how far the world scrolled.
+function runStep(dt, speed, now) {
   // Rules that need world sizes as well as the slider values.
   const worldCfg = { ...cfg, roofHeight: RULES.track.roofHeight };
   const prevDistance = game.distance;
-  const speed = speedAt(game.time, cfg.runSpeed, RULES.speedRamp);
   const runDt = advance(game, dt, speed);
   track.move(runDt);
   const groundY = groundHeightAt(player.x, game.distance, track.items, worldCfg, { y: player.y, prevDistance });
@@ -182,16 +206,7 @@ function frame(nowMs) {
     }
     if (hits.crash && game.state === 'running') onCrash(now);
   }
-  // The chase runs with the run, and keeps going after a crash for the catch.
-  updateChase(chase, game.state === 'running' || game.state === 'crashed' ? dt : 0, RULES.chase);
-  if (game.state === 'crashed' && crashScreen.hidden && crashScreenReady(game, now, RULES.crash.screenDelay)) {
-    showCrashScreen();
-  }
-
-  world.update(speed * runDt, player, cfg, track.items, game.distance, now, groundY, dt, chase.gap);
-  scoreEl.textContent = pad(score(game, RULES));
-  coinsEl.textContent = String(game.coins);
-  requestAnimationFrame(frame);
+  return { scroll: speed * runDt, groundY };
 }
 
 // Exposed for browser checks during development.

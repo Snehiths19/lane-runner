@@ -199,3 +199,12 @@ test('the intro train passes under the runner during the intro leap', () => {
     assert.ok(passed, `speed ${runSpeed}: the train went past`);
   }
 });
+
+test('sections start only after the intro leap lands, even with slow tuning', () => {
+  const track = createTrack(SECTIONS, movingOpts, seeded());
+  track.addIntroTrain({ runSpeed: 40, gravity: 10, leapHeight: 5 });
+  track.fill(400, 0, 40);
+  const airTime = 2 * Math.sqrt(2 * 5 / 10);
+  const first = track.items.filter((i) => !i.speed)[0];
+  assert.ok(first.start > airTime * 40, `first item at ${first.start}, landing at ${airTime * 40}`);
+});

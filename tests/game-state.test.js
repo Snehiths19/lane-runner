@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score, speedAt } from '../src/game-state.js';
+import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score, speedAt, substeps } from '../src/game-state.js';
 
 test('begins on the start screen', () => {
   const g = createGame();
@@ -122,4 +122,11 @@ test('run time counts only while running and restarts with a new run', () => {
   crashScreenReady(g, 20, 1);
   routeAction(g, 'jump');
   assert.equal(g.time, 0);
+});
+
+test('a frame is split so no step moves more than 0.25 m', () => {
+  assert.equal(substeps(1 / 60, 12), 1);
+  const n = substeps(0.05, 32); // ramped top speed on a slow phone frame
+  assert.ok((32 * 0.05) / n <= 0.25, `${n} steps`);
+  assert.equal(substeps(0.05, 0), 1);
 });

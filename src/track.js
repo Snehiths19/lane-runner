@@ -60,6 +60,8 @@ export function createTrack(sections, { rowLength, startClear, roofHeight, train
     const peakTime = Math.sqrt(2 * leapHeight / gravity);
     const front = (peakTime - length / closing / 2) * closing;
     items.unshift({ id: nextId++, kind: 'train', lane: 1, start: front, end: front + length, base: 0, speed: trainSpeed, prevStart: front });
+    // Nothing can be hit during the leap, so sections only start after the landing (with some room).
+    nextStart = Math.max(nextStart, 2 * peakTime * runSpeed + 2 * rowLength);
   }
 
   // Moving trains drive toward the runner.

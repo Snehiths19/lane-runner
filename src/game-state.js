@@ -37,6 +37,12 @@ export function advance(g, dt, speed) {
   return dt;
 }
 
+// How many steps a frame needs so the runner (and an oncoming moving train) never moves more than
+// maxStep metres per step: thin barriers and coins can't be skipped at high speed or low frame rates.
+export function substeps(dt, speed, maxStep = 0.25) {
+  return Math.max(1, Math.ceil((speed * dt) / maxStep));
+}
+
 // Speed ramp (CONTEXT.md): run speed rises evenly by maxBoost over rampTime seconds, then holds.
 export function speedAt(time, runSpeed, { rampTime, maxBoost }) {
   return runSpeed * (1 + maxBoost * Math.min(1, time / rampTime));
