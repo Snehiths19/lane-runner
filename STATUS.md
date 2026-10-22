@@ -17,12 +17,12 @@ _Last updated: 2026-10-22._
 | — | Baseline / tweaks rules layer (`src/rules/`) + `FEATURES.md` checklist | ✅ |
 | M2 · 2a | Dodge & crash: sections, obstacles, coins, crash, score, crash card, top runs | ✅ accepted |
 | M2 · 2b | Trains: ramps, roofs, roof coins, roof hopping, side-bump bounce, surface camera | ✅ accepted |
-| **M2 · 2c** | **Chase: stumble, inspector & dog, edge-swipe stumble** | **⏭ next** |
-| M2 · 2d | Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera | ⬜ |
+| M2 · 2c | Chase: stumble, inspector & dog, edge-swipe stumble | ✅ built, awaiting Snehith's check |
+| **M2 · 2d** | **Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera** | **⏭ next** |
 | M3–M6 | Power-ups → hoverboard/keys/revive → progression/shop → events/world | ⬜ |
 | Personal | Music, Snehith's face, friend events, San Jose | ⬜ |
 
-Tests: 102 passing (`npm test`). Snehith's only tweak so far: run speed 20 (`src/rules/tweaks.js`).
+Tests: 114 passing (`npm test`). Snehith's only tweak so far: run speed 20 (`src/rules/tweaks.js`).
 
 ## How we work (Snehith's preferred process)
 
@@ -43,25 +43,37 @@ Snehith is not a coder: Claude builds and verifies; Snehith decides gameplay and
 
 Decide each slice just before building it (not all up front).
 
-## Next: slice 2c, the chase
+## Just built: slice 2c, the chase
 
-FEATURES IDs: HIT-2 (stumble half; the bounce already exists), HIT-3, CHS-1, MOV-7.
+Spec `docs/superpowers/specs/2026-10-22-m2c-chase-design.md`, plan `docs/superpowers/plans/2026-10-22-m2c-chase.md`.
+`src/chase.js` (stumble timer, chasers' gap, catch), baseline `chase` numbers, edge swipe nudge in
+`player.js`, inspector and dog cutouts in `world.js`. Stumble length (3 s) and the start chase (2 s)
+are 🧪 placeholders to measure from Poki gameplay.
 
-Already decided (see `CONTEXT.md`):
-- A **side bump** bounces back (built in 2b). In 2c it also starts a **stumble**: a second side bump
-  while stumbling is a **crash**.
-- **Edge swipe** (swiping into the wall at the track edge) counts as a side bump → stumble (baseline;
-  Snehith chose the baseline over "harmless").
-- The stumble window's length is unknown → measure from Subway Surfers gameplay (🧪).
-- The **inspector & dog** chase from the start, drop back, close in when you stumble, and catch you on a
-  crash (WP).
+Snehith's acceptance check: (1) the inspector and dog are there at the start and drop back;
+(2) bumping a train's side brings them close for a few seconds; (3) a second bump while they're close
+ends the run and they grab you; (4) swiping into the wall at the edge counts as a bump; (5) it still
+feels fair on phone and PC.
 
-Open questions for the 2c grill (suggested order):
-1. How the inspector & dog look and appear in our flat-cutout style (placeholder now, skin later).
-2. Stumble length and feedback, and whether stumbling also briefly slows or blocks anything.
-3. What a "catch" looks like on a crash, and how it fits the ~1 s before the crash card.
-4. Does the chase start immediately, or after the (2d) intro leap? A placeholder until 2d?
-5. Whether a stumble ends early (in Subway Surfers the inspector drops back after a while).
+## Next: slice 2d, the alive world
+
+FEATURES IDs: TRK-6 (moving trains), TRK-9 (tunnels), MOV-6 (speed ramp), CHS-2 (intro leap),
+CAM-1 (jump lift and sideways camera follow).
+
+Snehith usually accepts every grill recommendation: take the recommended answers, record them in
+`CONTEXT.md` and the design doc, list them in the summary, and keep building.
+
+Open questions for the 2d grill (suggested order):
+1. How fast moving trains come at you and how often they appear in sections.
+2. Speed ramp: how fast speed rises and where it caps (measure from Poki 🧪).
+3. Intro: how much of the graffiti scene to copy before the leap, and whether a tap skips it.
+4. Tunnels: looks only, or also walls that block lane changes.
+5. Camera: how much it lifts on jumps and slides with lane changes.
+
+Cloud-session browser checks: jsdelivr (the three.js CDN) is blocked by the cloud proxy. Get three
+from npm (`npm pack three@0.160.0`) and serve it to the page with Playwright `page.route`; use the
+preinstalled Chromium at `/opt/pw-browsers/chromium`. Software WebGL runs slower than real time at
+PC size, so wait on game time (`__laneRunner.chase.runTime`), not wall time.
 
 ## Measuring Subway Surfers (for 🧪 numbers)
 

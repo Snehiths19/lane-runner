@@ -80,6 +80,17 @@ HUD (score + x1 top-right, ⚙️ top-left), hit flash, crash card after ~1 s, b
 - **Side bump bounces back** already in 2b (stumble penalty comes in 2c).
 - Camera follows **surface height** now; jump lift and sideways follow in 2d.
 
+### Slice 2c · chase (grill in the claude.ai project thread, built 10-22)
+- First slice continued from the claude.ai project (phone) instead of the local terminal.
+- He accepts the recommended answer in grills as a rule ("I usually accept all recommendations"), so
+  later grills can take the recommendations and list them instead of asking one by one.
+- Chasers are **two flat cutouts** like the runner (tall inspector in a blue cap, small dog).
+- Stumble = baseline: **no slowdown**, chasers close for ~3 s 🧪, then drop back. That also settled
+  "does a stumble end early".
+- Crash: chasers **run up and grab** within the existing 1 s pause.
+- Chase starts **right away** (close ~2 s, then drops back); the 2d intro leap will go before it.
+- Close gap tuned to 2 m in browser checks so the dog is still on screen on wide PC screens.
+
 ## Ideas parked for later
 
 - Friend events and power-ups from friends; his face on the runner; San Jose as a World Tour city;
