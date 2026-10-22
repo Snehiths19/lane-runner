@@ -76,9 +76,37 @@ test('rejects a section whose first or last row is not clear', () => {
 c . .`), /opennear.*first and last rows must be clear/);
 });
 
-test('rejects a coin inside a train', () => {
-  assert.throws(() => parseSections(`name: buried
+test('a ramp leads onto a train, with coins on ramp and roof', () => {
+  const [s] = parseSections(`name: rooftop
 . . .
+. B^ .
 . Bc .
-. . .`), /buried.*line 3.*coin inside a train/);
+. Rc .
+. . .`);
+  assert.deepEqual(s.rows[1][1], { obstacle: 'R', coin: 'c' });
+  assert.deepEqual(s.rows[2][1], { obstacle: 'B', coin: 'c' });
+  assert.deepEqual(s.rows[3][1], { obstacle: 'B', coin: '^' });
+});
+
+test('rejects a ramp that does not lead onto a train', () => {
+  assert.throws(() => parseSections(`name: nowhere
+. . .
+. . .
+. R .
+. . .`), /nowhere.*line 4.*ramp must lead onto a train/);
+});
+
+test('rejects a ramp combined with another obstacle', () => {
+  assert.throws(() => parseSections(`name: clash
+. . .
+. B .
+. RL .
+. . .`), /clash.*line 4.*ramp can't share a cell/);
+});
+
+test('rejects two obstacles in one cell', () => {
+  assert.throws(() => parseSections(`name: pile
+. . .
+. LO .
+. . .`), /pile.*line 3.*only one obstacle per cell/);
 });

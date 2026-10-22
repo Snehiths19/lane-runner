@@ -3,18 +3,21 @@
 // cells (left, middle, right). The bottom line is the nearest row, so rows come out near → far.
 // Mistakes throw with the section name and line number, so a typo can't slip into the game.
 
-const OBSTACLES = ['L', 'O', 'B']; // low barrier, overhead bar, train
+const OBSTACLES = ['L', 'O', 'B', 'R']; // low barrier, overhead bar, train, ramp
 const COINS = ['c', '^'];          // coin, high coin
 
 function parseCell(token, where) {
   const cell = { obstacle: null, coin: null };
   if (token === '.') return cell;
   for (const ch of token) {
+    if (OBSTACLES.includes(ch) && cell.obstacle) {
+      const why = ch === 'R' || cell.obstacle === 'R' ? "a ramp can't share a cell with another obstacle" : 'only one obstacle per cell';
+      throw new Error(`${where}: ${why}`);
+    }
     if (OBSTACLES.includes(ch)) cell.obstacle = ch;
     else if (COINS.includes(ch)) cell.coin = ch;
     else throw new Error(`${where}: unknown symbol "${ch}"`);
   }
-  if (cell.obstacle === 'B' && cell.coin) throw new Error(`${where}: coin inside a train`);
   return cell;
 }
 
@@ -24,7 +27,7 @@ export function parseSections(text) {
     const trimmed = line.trim();
     if (!trimmed || trimmed.startsWith('#')) return;
     if (trimmed.startsWith('name:')) {
-      sections.push({ name: trimmed.slice(5).trim(), rows: [] });
+      sections.push({ name: trimmed.slice(5).trim(), rows: [], lines: [] });
       return;
     }
     if (!sections.length) throw new Error(`Line ${i + 1}: rows must come after a "name:" line`);
@@ -32,9 +35,18 @@ export function parseSections(text) {
     const tokens = trimmed.split(/\s+/);
     if (tokens.length !== 3) throw new Error(`${where}: each row needs 3 cells, found ${tokens.length}`);
     sections.at(-1).rows.push(tokens.map((token) => parseCell(token, where)));
+    sections.at(-1).lines.push(i + 1);
   });
   for (const s of sections) {
     s.rows.reverse();
+    const lines = s.lines.reverse();
+    delete s.lines;
+    // A ramp sits directly in front of a train in the same lane (CONTEXT.md invariant).
+    s.rows.forEach((row, r) => row.forEach((cell, lane) => {
+      if (cell.obstacle === 'R' && s.rows[r + 1]?.[lane].obstacle !== 'B') {
+        throw new Error(`Section "${s.name}", line ${lines[r]}: a ramp must lead onto a train (put B on the line above it)`);
+      }
+    }));
     // Any two sections must be able to follow each other (CONTEXT.md invariant).
     const clear = (row) => row.every((c) => !c.obstacle && !c.coin);
     if (!s.rows.length || !clear(s.rows[0]) || !clear(s.rows.at(-1))) {
