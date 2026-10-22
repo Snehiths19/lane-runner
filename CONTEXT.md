@@ -109,7 +109,11 @@ The runner's hitbox meeting an obstacle while changing lanes into it from the si
 The top of a train, a raised running surface. Leaving it (off the far end, or sideways into a lane without a train) drops the runner to the track; sideways onto a neighbouring train's roof keeps them up.
 
 **Stumble**:
-The warning state after a side bump, lasting a short window (Subway Surfers' length still to be measured); a second side bump while stumbling is a crash.
+The warning state after a side bump, lasting a short window (Subway Surfers' length still to be measured; placeholder 3 s 🧪); a second side bump while stumbling is a crash. During it the **chasers** run right behind the runner, then drop back when it ends. No slowdown: the runner keeps full speed and control (baseline; Snehith chose this 2026-10-22).
+
+**Chasers**:
+The inspector and the dog who chase the runner (CHS-1). Placeholder looks: two flat cutouts drawn like the runner (a tall inspector, a small dog), shown behind the runner only when close; real art comes later as skins. On a **crash** they run up and grab the runner within the existing 1 s pause before the crash screen (the **catch**; baseline, Snehith chose this 2026-10-22). They start every run right behind the runner for the first couple of seconds, then drop back out of view (the 2d intro leap will later play before this).
+_Avoid_: enemies, guards
 
 **Section**:
 A short hand-made stretch of track (a few seconds long) with obstacles and coins placed in lanes; runs are built by chaining sections in random order. Sections are original designs in Subway Surfers' style (same building blocks, spacing measured from its gameplay), never traced copies of its layouts.
