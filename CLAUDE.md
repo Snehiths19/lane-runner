@@ -5,18 +5,29 @@ Snehith is not a coder. Claude writes and verifies all code; Snehith plays, give
 and makes gameplay/design decisions. Present those decisions as plain-language choices, not code.
 
 ## Project
-- Browser 3D endless runner (Subway Surfers-inspired), Three.js, plain HTML/JS — no build step.
+- Browser 3D endless runner that first copies Subway Surfers **rule for rule** (ADR 0002), then gets
+  personalized. Three.js, plain HTML/JS — no build step.
+- **`FEATURES.md` is the roadmap**: every Subway Surfers feature with its baseline numbers, source,
+  status and Snehith's tweak. Update its Status column as features land.
+- **`CONTEXT.md` is the glossary** (terms + invariants). Use its terms; update it when a term changes.
+- Gameplay numbers come from public sources or gameplay measurement, not reverse engineering.
 - Must work on PC (keyboard) and phone (swipe/touch), portrait and landscape.
-- Tuning values (speed, gravity, jump, lane-switch time) live in one config and are exposed via an on-screen slider panel.
 - Never use Subway Surfers assets or the trademarked name in the game.
 
 ## Code map
-- Pure, unit-tested rules (no DOM/Three.js): `src/config.js` (defaults + fingerprint), `src/tuning.js`
+- Rules: `src/rules/baseline.js` (Subway Surfers values, tagged with FEATURES.md IDs — never edit for
+  taste), `src/rules/tweaks.js` (Snehith's changes, same shape, only what differs),
+  `src/rules/resolve.js` (merge; unknown paths / wrong types throw), `src/rules/index.js` (`RULES`).
+- Pure, unit-tested rules (no DOM/Three.js): `src/config.js` (slider defaults from `RULES.movement`,
+  fingerprint, slider ranges), `src/tuning.js`
   (saved tweaks), `src/player.js` (movement + hitbox), `src/game-state.js` (start/running/paused),
   `src/input.js` (`classifySwipe`, `keyToAction`), `src/view.js` (camera fit).
 - Browser-only, verified by playing: `src/world.js` (Three.js scene), `src/panel.js`, `src/main.js`.
-- To make pasted "Copy settings" values permanent: update `DEFAULTS` in `src/config.js` (sliders'
-  ranges are in `TUNING_RANGES`); the fingerprint changes automatically.
+- **To make pasted "Copy settings" values permanent:** put only the values that differ from
+  `BASELINE.movement` into `TWEAKS.movement` in `src/rules/tweaks.js` (with a dated comment), and note
+  the tweak in FEATURES.md's *Your tweak* column. The fingerprint changes automatically.
+- New gameplay numbers go in the baseline under their area (e.g. `powerUps.jetpack.duration`) with the
+  FEATURES.md ID and source; 🧪 marks placeholders awaiting measurement.
 
 ## Commands
 - `npm test` — run unit tests (Node built-in runner). Only commit when it reports `fail 0`.

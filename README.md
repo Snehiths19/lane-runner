@@ -1,6 +1,7 @@
 # Lane Runner
 
-A personal 3-lane endless runner inspired by Subway Surfers, built in the browser with Three.js.
+A personal 3-lane endless runner built in the browser with Three.js. It first copies Subway Surfers
+rule for rule, then gets personalized.
 Runs on PC (keyboard) and phone (swipe). No install needed — open the hosted page and play.
 
 **Play:** https://snehiths19.github.io/lane-runner/
@@ -19,22 +20,28 @@ Tap ⚙️ to open the sliders (on a phone the run pauses while it's open). Chan
 and are remembered in that browser.
 
 To make a tuning **permanent on every device**: press **Copy settings**, paste the text to Claude,
-and ask for it to become the defaults. When the defaults change, each browser drops its old
-tweaks and shows "New default settings loaded".
+and ask for it to become a tweak. When the defaults change, each browser drops its old slider
+values and shows "New default settings loaded".
+
+## Changing the game to your taste
+
+- **Subway Surfers' numbers** live in `src/rules/baseline.js` and stay untouched.
+- **Your changes** live in `src/rules/tweaks.js`. They override the baseline, and deleting one goes
+  back to the real Subway Surfers behavior.
+- **What exists and what's next:** [`FEATURES.md`](FEATURES.md). Write what you want in its
+  *Your tweak* column (plain words are fine) and ask Claude to apply it.
 
 ## Roadmap
 
-1. **Core movement** ✅ — endless track, 3 lanes, lane switch / jump / slide, tuning sliders.
-2. **Obstacles & coins** — collisions, crash/restart, score.
-3. **Difficulty** — speed ramps up over time, obstacle patterns.
-4. **Personalization** — your own character, music, then faces, friend events, San Jose setting.
-5. **Polish & publish** — sounds, effects, menus.
+Follows [`FEATURES.md`](FEATURES.md): M1 movement ✅ → M2 core loop (track, trains, hits, chase,
+score) → M3 power-ups → M4 hoverboard, keys & revive → M5 progression & shop → M6 events & world →
+personal additions (music, your face, friend events, San Jose).
 
 ## Development
 
 - `npm test` — unit tests for the game rules (no install needed; uses Node's built-in runner).
 - `npm run serve` — local server at http://localhost:8080.
-- Design docs: `docs/superpowers/specs/`. Plans: `docs/superpowers/plans/`.
+- Glossary: `CONTEXT.md`. Decisions: `docs/adr/`. Design docs: `docs/superpowers/specs/`. Plans: `docs/superpowers/plans/`.
 
 ## Notes
 
