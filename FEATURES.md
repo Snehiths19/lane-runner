@@ -10,6 +10,10 @@ change when better evidence about Subway Surfers turns up. See `CONTEXT.md` for 
 
 **Status:** ✅ built · 🔨 next up · ⬜ to do · 🧪 number must be measured from gameplay first · ➖ not planned (reason given)
 
+**Measuring (M):** done on the official web version (Poki, by SYBO) by recording the game's frames at
+~59 fps with timestamps. The camera follows the runner, so on-screen positions understate motion;
+rough values are marked as such and stay 🧪 until confirmed.
+
 **Source:** **H** = SYBO's official help center · **W** = Subway Surfers fan wiki · **WP** = Wikipedia ·
 **G** = guide/blog sites (low confidence) · **M** = measure from gameplay video
 
@@ -20,11 +24,12 @@ change when better evidence about Subway Surfers turns up. See `CONTEXT.md` for 
 | ID | Feature | Baseline | Numbers (source) | Status | Your tweak |
 |---|---|---|---|---|---|
 | MOV-1 | Three lanes, endless forward run | Run forward automatically; swipe to dodge | — (WP) | ✅ | |
-| MOV-2 | Lane change | Swipe left/right; works mid-air and mid-switch | switch time 🧪 (M) | ✅ | |
-| MOV-3 | Jump | Swipe up | height, air time 🧪 (M) | ✅ | |
+| MOV-2 | Lane change | Swipe left/right; works mid-air and mid-switch | ≈ 0.15–0.2 s, rough (M, 2026-10-22) 🧪 | ✅ | |
+| MOV-3 | Jump | Swipe up | air time ≈ 0.7 s (M, 2026-10-22); height 🧪 | ✅ | |
 | MOV-4 | Roll | Swipe down; mid-air swipe down drops fast into a roll | roll time 🧪 (M) | ✅ | |
 | MOV-5 | Run speed | Starts at a base speed | base speed 🧪 (M) | ✅ | Run speed 20 (by feel, 2026-10-18) |
 | MOV-6 | Speed ramp | Speed rises gradually during a run | curve & cap 🧪 (M) | ⬜ | |
+| CAM-1 | Camera follow | Camera rises with the runner during a jump and slides with lane changes, then settles | amount 🧪 (M) | ⬜ | |
 | MOV-7 | Edge swipe | Swiping into the wall at the track edge = side bump | — (M) | ⬜ | |
 
 ## M2 · Core loop (track, hits, chase, score)
@@ -44,11 +49,11 @@ change when better evidence about Subway Surfers turns up. See `CONTEXT.md` for 
 | HIT-2 | Side bump | Bounce back to the lane you left, and stumble | — (G) | 🔨 | |
 | HIT-3 | Stumble | Inspector catches up; a second hit while stumbling = crash | window length 🧪 (M) | 🔨 | |
 | CHS-1 | Inspector & dog | Chase you from the start, drop back, close in when you stumble, catch you on crash | — (WP) | 🔨 | |
-| CHS-2 | Intro | Run starts with the character caught spraying graffiti, then chased | — (WP) | ⬜ | |
+| CHS-2 | Intro | Run starts with the character caught spraying graffiti, then chased; the runner opens with a leap over an oncoming train | — (WP, M) | ⬜ | |
 | COI-1 | Coins on track | Lines and arcs of coins; high coins reached by jumping | — (WP) | 🔨 | |
-| SCO-1 | Score | Score counts up with distance × score multiplier | points per metre 🧪 (M) | 🔨 | |
+| SCO-1 | Score | Score counts up with distance × score multiplier | ≈ 14.6 points/s at x1 at run start (M, 2026-10-22) | 🔨 | |
 | SCO-2 | Best score | Highest score kept; "New best!" on crash screen | — | 🔨 | |
-| RUN-1 | Crash screen | Score, coins, best; tap to run again | — | 🔨 | |
+| RUN-1 | Crash screen | Notebook-style card: character, score, coins, keys & coin totals, leaderboard; buttons Menu / Boosts / PLAY (web: "Double Up" coins for an ad) | — (M) | 🔨 | Ads ➖ |
 
 ## M3 · Power-ups (picked up on the track)
 
