@@ -6,6 +6,7 @@ export function createPlayer() {
     lane: 1,
     x: 0,
     fromX: 0,   // x where the current lane switch started
+    fromLane: 1, // lane the current switch left (for bouncing back)
     switchT: 1, // 0..1 progress of the current lane switch (1 = done)
     y: 0,
     vy: 0,
@@ -30,6 +31,7 @@ export function handleAction(p, action, cfg) {
     // Allowed mid-air and mid-switch, like Subway Surfers.
     const next = p.lane + (action === 'left' ? -1 : 1);
     if (next < 0 || next > 2) return;
+    p.fromLane = p.lane;
     p.lane = next;
     p.fromX = p.x;
     p.switchT = 0;
@@ -49,6 +51,14 @@ export function handleAction(p, action, cfg) {
   }
 }
 
+// Side bump: head back to the lane the runner just left, from wherever they are now
+// (CONTEXT.md: a lane change remembers the lane it left).
+export function bounceBack(p) {
+  [p.lane, p.fromLane] = [p.fromLane, p.lane];
+  p.fromX = p.x;
+  p.switchT = 0;
+}
+
 export function isSliding(p) {
   return p.slideLeft > 0;
 }
@@ -59,6 +69,14 @@ const easeOut = (t) => 1 - (1 - t) * (1 - t);
 export function updatePlayer(p, dt, cfg, groundY = 0) {
   if (p.switchT < 1) p.switchT = Math.min(1, p.switchT + dt / cfg.laneSwitchTime);
   p.x = p.fromX + (laneX(p.lane, cfg) - p.fromX) * easeOut(p.switchT);
+
+  // On the ground the runner rides the surface: up ramps, and falls when it drops away
+  // (off the end of a roof, or sideways into a lane without a train).
+  if (p.grounded && groundY > p.y) p.y = groundY;
+  else if (p.grounded && groundY < p.y - 0.01) {
+    p.grounded = false;
+    p.vy = 0;
+  }
 
   if (!p.grounded) {
     // Exact for constant gravity, so the jump arc is the same at any frame rate.

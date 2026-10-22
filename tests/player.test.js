@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULTS } from '../src/config.js';
-import { createPlayer, handleAction, updatePlayer, isSliding, hitbox } from '../src/player.js';
+import { createPlayer, handleAction, updatePlayer, isSliding, hitbox, bounceBack } from '../src/player.js';
 
 const cfg = { ...DEFAULTS };
 
@@ -164,4 +164,42 @@ test('lands on the supplied ground height', () => {
   for (let i = 0; i < 60; i++) updatePlayer(p, 1 / 60, cfg, 1.5);
   assert.equal(p.grounded, true);
   assert.equal(p.y, 1.5);
+});
+
+test('follows a rising surface while grounded (running up a ramp)', () => {
+  const p = createPlayer();
+  updatePlayer(p, 1 / 60, cfg, 0.5);
+  assert.equal(p.y, 0.5);
+  assert.equal(p.grounded, true);
+  updatePlayer(p, 1 / 60, cfg, 0.9);
+  assert.equal(p.y, 0.9);
+});
+
+test('falls when the surface drops away (off the end of a roof), then lands', () => {
+  const p = createPlayer();
+  updatePlayer(p, 1 / 60, cfg, 3.6);
+  assert.equal(p.y, 3.6);
+  updatePlayer(p, 1 / 60, cfg, 0);
+  assert.equal(p.grounded, false, 'now falling');
+  assert.ok(p.y < 3.6 && p.y > 3.0, `fell a little: ${p.y}`);
+  for (let i = 0; i < 60; i++) updatePlayer(p, 1 / 60, cfg, 0);
+  assert.equal(p.grounded, true);
+  assert.equal(p.y, 0);
+});
+
+test('bounceBack returns to the lane left, keeping height', () => {
+  const p = createPlayer();
+  handleAction(p, 'jump', cfg);
+  step(p, 0.2);
+  handleAction(p, 'right', cfg);
+  step(p, 0.05);
+  const y = p.y;
+  const x = p.x;
+  bounceBack(p);
+  assert.equal(p.lane, 1);
+  assert.equal(p.y, y);
+  updatePlayer(p, 0, cfg);
+  assert.ok(Math.abs(p.x - x) < 1e-9, 'no teleport');
+  step(p, cfg.laneSwitchTime);
+  assert.ok(Math.abs(p.x) < 1e-9, 'back in the middle lane');
 });
