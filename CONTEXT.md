@@ -129,7 +129,7 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 
 ## Invariants
 
-- **Ground is height 0 — for now.** The runner lands only at y = 0. Rideable **trains** (baseline, early) must replace this with "ground height under the runner", in movement rules and collisions alike.
+- **Ground height comes from one place.** Landing and collisions always ask for the ground height under the runner (by lane and distance); it is 0 everywhere until **trains** (slice 2b) add roofs. Nothing may assume y = 0 directly.
 - **Every section starts and ends with all three lanes clear**, so any two sections can follow each other without creating an impossible spot.
 - **Placing is generic.** Whatever puts obstacles on the track must also be able to place coins and friend events.
 - **Hitbox is separate from image.** Collisions never use image size.
