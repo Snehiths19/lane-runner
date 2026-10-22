@@ -107,7 +107,7 @@ The runner's hitbox meeting an obstacle while changing lanes into it from the si
 The warning state after a side bump, lasting a short window (Subway Surfers' length still to be measured); a second side bump while stumbling is a crash.
 
 **Section**:
-A short hand-made stretch of track (a few seconds long) with obstacles and coins placed in lanes; runs are built by chaining sections in random order.
+A short hand-made stretch of track (a few seconds long) with obstacles and coins placed in lanes; runs are built by chaining sections in random order. Sections are original designs in Subway Surfers' style (same building blocks, spacing measured from its gameplay), never traced copies of its layouts.
 _Avoid_: chunk, pattern, level
 
 **Section map**:

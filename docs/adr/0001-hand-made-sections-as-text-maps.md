@@ -12,3 +12,9 @@ can't be drawn without extending the format.
 
 - **Random rows with a "one lane always free" rule**: endless variety, but no designed coin
   shapes, harder to guarantee fairness across rows, and no place for hand-authored moments.
+
+## Update (2026-10-22)
+
+After the baseline-first decision (ADR 0002), sections stay **original**: written by us in Subway
+Surfers' style, with obstacle spacing and density measured from its gameplay, but not traced from its
+layouts, which are its designers' content and would make the game unsafe to host publicly.
