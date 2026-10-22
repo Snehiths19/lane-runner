@@ -1,11 +1,22 @@
 # Lane Runner
 
-A personal, Subway Surfers-inspired 3-lane endless runner. The **canvas** is the base game; **skins**
-and **friend events** personalize it.
+A personal 3-lane endless runner that first copies Subway Surfers rule for rule (the **baseline**),
+then gets personalized through **tweaks**, **skins** and **friend events**.
 
 ## Language
 
 ### The game
+
+**Baseline**:
+The game's rules and numbers as Subway Surfers has them, each with a source (official help, wiki, or measured from gameplay).
+_Avoid_: defaults (ambiguous), original
+
+**Tweak**:
+A deliberate personal change to one baseline rule or number, kept separately so the baseline stays intact.
+_Avoid_: mod, hack, override (in conversation)
+
+**Feature checklist**:
+The list of every Subway Surfers feature, its baseline numbers and source, its build status, and any tweak (`FEATURES.md`).
 
 **Canvas**:
 The base game (track, lanes, movement, camera, controls, tuning) that skins and events sit on.
@@ -43,24 +54,42 @@ A knee-high obstacle passed by jumping over it.
 A head-height obstacle passed by sliding under it.
 
 **Blocker**:
-A full-height obstacle passed only by changing lanes. A skin may draw it as a train car.
-_Avoid_: train (trains you can stand on are a separate, later idea)
+A full-height obstacle passed only by changing lanes.
+
+**Train**:
+A train car on a lane, parked or moving toward the runner; its front is a head-on hit, its roof can be run on, reached by a **ramp**.
+
+**Ramp**:
+A slope at the back of a train that lets the runner run up onto the roof.
 
 ### Scoring
 
 **Distance**:
-How far the current run has gone, in metres; this is the score.
-_Avoid_: score (as a separate number), points
+How far the current run has gone, in metres.
+
+**Score**:
+Points earned during a run: distance-based points times the score multiplier.
+_Avoid_: points
+
+**Score multiplier**:
+The number score is multiplied by; raised permanently by completing missions (up to x30), and temporarily by pickups and boosters.
 
 **Coin**:
-A collectible on the track; the run's coin count is shown beside distance and doesn't change the score (for now).
+A collectible on the track, also the currency spent on upgrades, hoverboards and items.
+
+**Key**:
+A rarer currency; mainly spent to revive after a crash, at a cost that doubles each time within a run.
+
+**Revive**:
+Continuing a crashed run by spending keys, offered right after a crash.
+_Avoid_: save me (that's the button copy), continue
 
 **Crash screen**:
-What shows about 0.7 s after a crash: the run's distance and coins, best distance, and "New best!" when beaten.
+What shows after a crash and any revive offer: the run's score, coins and best score, with "New best!" when beaten.
 
-**Best distance**:
-The longest distance reached on this device, shown on the crash screen.
-_Avoid_: high score
+**Best score**:
+The highest score reached on this device, shown on the crash screen.
+_Avoid_: high score, best distance
 
 ### Hits
 
@@ -93,19 +122,20 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 
 ## Relationships
 
-- A **Run** moves through **run states**: start → running ⇄ paused → crashed → (tap) a new run, running. The title (start) screen only appears when the game is first opened.
+- A **Run** moves through **run states**: start → running ⇄ paused → crashed → (revive → running) or crash screen → (tap) a new run. The title (start) screen only appears when the game is first opened.
 - Every **obstacle**, coin and **friend event** sits in exactly one **lane** at a distance along the track.
 - A **run** is an endless chain of **sections**; each **section** holds obstacles and coins (later also friend events).
 - Each **obstacle** kind is beaten by exactly one move: **low barrier** → jump, **overhead bar** → slide, **blocker** → lane change.
 
 ## Invariants
 
-- **Ground is height 0.** The runner lands only at y = 0. Standing on trains (later) must replace this with "ground height under the runner", in movement rules and collisions alike.
+- **Ground is height 0 — for now.** The runner lands only at y = 0. Rideable **trains** (baseline, early) must replace this with "ground height under the runner", in movement rules and collisions alike.
 - **Every section starts and ends with all three lanes clear**, so any two sections can follow each other without creating an impossible spot.
 - **Placing is generic.** Whatever puts obstacles on the track must also be able to place coins and friend events.
 - **Hitbox is separate from image.** Collisions never use image size.
 - **The tap that leaves the start screen or crash screen never also moves the runner**, and crash-screen taps are ignored until it appears.
-- **Best distance is not a tuning value.** It's stored apart from slider tweaks and survives a defaults reset.
+- **Baseline values are never edited to suit taste.** Taste goes in tweaks; the baseline only changes when better evidence about Subway Surfers arrives.
+- **Best score is not a tuning value.** It's stored apart from slider tweaks and survives a defaults reset.
 - **A lane change remembers the lane it left**, so a side bump can bounce the runner back mid-switch.
 
 ## Example dialogue
@@ -115,5 +145,6 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 
 ## Flagged ambiguities
 
-- "side bump" does **not** include swiping past the edge of the track: that is harmless and ignored (a deliberate difference from Subway Surfers).
-- "train" could mean a **blocker** drawn as a train car or a train you can run on top of. Resolved: step 2 has **blockers** only; rideable trains come later.
+- Swiping past the edge of the track: baseline (Subway Surfers) counts it as a **side bump** into the wall, so it stumbles. Snehith first chose "harmless", then chose the baseline; if wanted later, it becomes a **tweak**.
+- "score" was first used to mean distance. Resolved: **score** is distance-based points × **score multiplier**; **distance** is just metres.
+- "train" could mean a **blocker** drawn as a train car or a train you can run on top of. Resolved: **trains** are rideable (baseline); **blockers** are walls you can only go around.
