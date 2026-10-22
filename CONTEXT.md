@@ -57,6 +57,18 @@ A head-height obstacle passed by sliding under it.
 The full-height obstacle: one or more train cars in a lane, parked or (later) moving toward the runner. Its front is a **head-on hit**; without a **ramp** it's passed by changing lanes; its roof can be run on.
 _Avoid_: blocker, wall (walls and poles are separate kinds, later)
 
+**Moving train**:
+A **train** that drives toward the runner (written `M` in a section map; stacked `M` rows = one long moving train). Same rules as a parked train (front = **head-on hit**, roof can be run on), but never has a **ramp**, and its lane is empty in the rest of its section so it meets the runner where the map shows it.
+
+**Speed ramp**:
+The run speed rising gradually from the starting **run speed** to a cap during a run (MOV-6).
+
+**Intro leap**:
+How every run opens (CHS-2): the runner makes one automatic high leap over an oncoming one-car **moving train** in the middle lane, with the **chasers** right behind. Swipes are ignored and nothing can be hit until the runner lands. The graffiti scene before it waits for real art.
+
+**Tunnel**:
+A stretch where the track runs through a covered tunnel (TRK-9). Looks only: it changes nothing about lanes, hits or swipes.
+
 **Ramp**:
 A slope at the near end of a train (the end the runner meets first) that lets the runner run up onto the roof.
 

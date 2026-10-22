@@ -17,7 +17,7 @@ _Last updated: 2026-10-22._
 | — | Baseline / tweaks rules layer (`src/rules/`) + `FEATURES.md` checklist | ✅ |
 | M2 · 2a | Dodge & crash: sections, obstacles, coins, crash, score, crash card, top runs | ✅ accepted |
 | M2 · 2b | Trains: ramps, roofs, roof coins, roof hopping, side-bump bounce, surface camera | ✅ accepted |
-| M2 · 2c | Chase: stumble, inspector & dog, edge-swipe stumble | ✅ built, awaiting Snehith's check |
+| M2 · 2c | Chase: stumble, inspector & dog, edge-swipe stumble | ✅ accepted |
 | **M2 · 2d** | **Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera** | **⏭ next** |
 | M3–M6 | Power-ups → hoverboard/keys/revive → progression/shop → events/world | ⬜ |
 | Personal | Music, Snehith's face, friend events, San Jose | ⬜ |
@@ -47,7 +47,7 @@ Snehith is not a coder: Claude builds and verifies; Snehith decides gameplay and
 
 Decide each slice just before building it (not all up front).
 
-## Just built: slice 2c, the chase
+## Done: slice 2c, the chase (accepted 2026-10-22: "Looks good")
 
 Spec `docs/superpowers/specs/2026-10-22-m2c-chase-design.md`, plan `docs/superpowers/plans/2026-10-22-m2c-chase.md`.
 `src/chase.js` (stumble timer, chasers' gap, catch), baseline `chase` numbers, edge swipe nudge in
