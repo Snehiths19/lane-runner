@@ -216,3 +216,42 @@ test('a bounce in progress ignores further bumps until it finishes', () => {
   bounceBack(p);
   assert.equal(p.lane, 1, 'a new bump after the bounce finished works again');
 });
+
+test('bounceBack reports only a new bounce', () => {
+  const p = createPlayer();
+  handleAction(p, 'right', cfg);
+  step(p, 0.05);
+  assert.equal(bounceBack(p), true);
+  assert.equal(bounceBack(p), false, 'still touching the same train is not a new bump');
+});
+
+test('edge swipe nudges toward the wall and back, lane unchanged', () => {
+  const p = createPlayer();
+  handleAction(p, 'left', cfg);
+  step(p, cfg.laneSwitchTime);
+  assert.equal(handleAction(p, 'left', cfg), 'edge');
+  assert.equal(p.lane, 0);
+  step(p, 0.1);
+  assert.ok(p.x < -2.5 - 0.1, `nudged toward the wall: x was ${p.x}`);
+  step(p, 0.3);
+  assert.ok(Math.abs(p.x - -2.5) < 1e-9, `back at the lane centre: x was ${p.x}`);
+});
+
+test('right edge swipe nudges right; normal swipes return nothing', () => {
+  const p = createPlayer();
+  assert.equal(handleAction(p, 'right', cfg), undefined);
+  step(p, cfg.laneSwitchTime);
+  assert.equal(handleAction(p, 'right', cfg), 'edge');
+  step(p, 0.1);
+  assert.ok(p.x > 2.5 + 0.1, `x was ${p.x}`);
+});
+
+test('edge swipe mid-switch (left twice quickly) is an edge bump', () => {
+  const p = createPlayer();
+  handleAction(p, 'left', cfg);
+  step(p, 0.03);
+  assert.equal(handleAction(p, 'left', cfg), 'edge');
+  assert.equal(p.lane, 0);
+  step(p, 0.5);
+  assert.ok(Math.abs(p.x - -2.5) < 1e-9, `x was ${p.x}`);
+});

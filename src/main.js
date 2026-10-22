@@ -12,6 +12,7 @@ import { createTrack } from './track.js';
 import { checkHits } from './hits.js';
 import { groundHeightAt } from './ground.js';
 import { loadRuns, recordRun } from './runs.js';
+import { createChase, updateChase, bump, startCatch } from './chase.js';
 
 const canvas = document.getElementById('game');
 const stage = document.getElementById('stage');
@@ -41,6 +42,7 @@ try {
 
 const game = createGame();
 let player = createPlayer();
+let chase = createChase(RULES.chase);
 const world = createWorld(canvas);
 const track = createTrack(sections, RULES.track);
 let runId = game.runId;
@@ -49,7 +51,12 @@ let result = null; // this run's recorded score, best and top runs
 function onAction(action) {
   const move = routeAction(game, action);
   startScreen.hidden = game.state !== 'start';
-  if (move) handleAction(player, move, cfg);
+  if (move && handleAction(player, move, cfg) === 'edge') onBump(performance.now() / 1000);
+}
+
+// A side bump or edge swipe: a stumble, or a crash if already stumbling (CONTEXT.md: Stumble).
+function onBump(now) {
+  if (bump(chase, RULES.chase) === 'crash') onCrash(now);
 }
 
 attachInput(canvas, onAction);
@@ -59,7 +66,9 @@ crashScreen.addEventListener('click', () => onAction('jump'));
 
 function newRun() {
   player = createPlayer();
+  chase = createChase(RULES.chase);
   window.__laneRunner.player = player;
+  window.__laneRunner.chase = chase;
   track.reset();
   world.reset();
   result = null;
@@ -83,6 +92,7 @@ function showCrashScreen() {
 
 function onCrash(now) {
   crash(game, now);
+  startCatch(chase);
   const finalScore = score(game, RULES);
   result = { score: finalScore, ...recordRun(storage, finalScore) };
   world.crashed();
@@ -150,24 +160,27 @@ function frame(nowMs) {
     track.fill(game.distance + 150);
     track.dropBefore(game.distance - 10);
     const hits = checkHits(player, track.items, game.distance, worldCfg, prevDistance);
-    if (hits.sideBump && !hits.crash) bounceBack(player);
+    // Only a new bounce is a new bump: still touching the same train while heading back isn't.
+    if (hits.sideBump && !hits.crash && bounceBack(player)) onBump(now);
     if (hits.coins.length) {
       game.coins += hits.coins.length;
       const taken = new Set(hits.coins);
       track.items.splice(0, track.items.length, ...track.items.filter((i) => !taken.has(i.id)));
     }
-    if (hits.crash) onCrash(now);
+    if (hits.crash && game.state === 'running') onCrash(now);
   }
+  // The chase runs with the run, and keeps going after a crash for the catch.
+  updateChase(chase, game.state === 'running' || game.state === 'crashed' ? dt : 0, RULES.chase);
   if (game.state === 'crashed' && crashScreen.hidden && crashScreenReady(game, now, RULES.crash.screenDelay)) {
     showCrashScreen();
   }
 
-  world.update(cfg.runSpeed * runDt, player, cfg, track.items, game.distance, now, groundY, dt);
+  world.update(cfg.runSpeed * runDt, player, cfg, track.items, game.distance, now, groundY, dt, chase.gap);
   scoreEl.textContent = pad(score(game, RULES));
   coinsEl.textContent = String(game.coins);
   requestAnimationFrame(frame);
 }
 
 // Exposed for browser checks during development.
-window.__laneRunner = { game, player, cfg, track };
+window.__laneRunner = { game, player, cfg, track, chase };
 requestAnimationFrame(frame);
