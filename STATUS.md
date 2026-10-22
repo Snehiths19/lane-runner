@@ -26,6 +26,10 @@ Tests: 102 passing (`npm test`). Snehith's only tweak so far: run speed 20 (`src
 
 ## How we work (Snehith's preferred process)
 
+The skills this uses (`/grill-with-docs`, `/grill-me`, `/tdd`) are copied into `.claude/skills/`, so
+cloud sessions have them too. The writing-plans skill comes from the superpowers plugin; if a session
+doesn't have it, follow the plan format of the existing files in `docs/superpowers/plans/`.
+
 Snehith is not a coder: Claude builds and verifies; Snehith decides gameplay and checks feel.
 
 1. **Grill** the slice with `/grill-with-docs`: one question at a time, each with a recommendation
