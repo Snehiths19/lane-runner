@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score } from '../src/game-state.js';
+import { createGame, routeAction, setPaused, advance, clampDt, crash, crashScreenReady, score, speedAt } from '../src/game-state.js';
 
 test('begins on the start screen', () => {
   const g = createGame();
@@ -97,4 +97,29 @@ test('score is distance times points per metre times the multiplier, rounded dow
   const g = runningGame();
   g.distance = 100;
   assert.equal(score(g, { scoring: { pointsPerMetre: 14.6 / 12 } }), 121);
+});
+
+const ramp = { rampTime: 150, maxBoost: 0.6 };
+
+test('speed ramp: starts at run speed, rises evenly, then holds at the cap', () => {
+  assert.equal(speedAt(0, 20, ramp), 20);
+  assert.ok(Math.abs(speedAt(75, 20, ramp) - 26) < 1e-9);
+  assert.ok(Math.abs(speedAt(150, 20, ramp) - 32) < 1e-9);
+  assert.ok(Math.abs(speedAt(600, 20, ramp) - 32) < 1e-9);
+});
+
+test('run time counts only while running and restarts with a new run', () => {
+  const g = createGame();
+  advance(g, 1, 12);
+  assert.equal(g.time, 0, 'not on the start screen');
+  routeAction(g, 'jump');
+  advance(g, 0.5, 12);
+  advance(g, 0.5, 12);
+  assert.equal(g.time, 1);
+  crash(g, 10);
+  advance(g, 1, 12);
+  assert.equal(g.time, 1, 'not after a crash');
+  crashScreenReady(g, 20, 1);
+  routeAction(g, 'jump');
+  assert.equal(g.time, 0);
 });
