@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { parseSections } from '../src/sections.js';
 import { createTrack } from '../src/track.js';
 
-const opts = { rowLength: 5, startClear: 36 };
+const opts = { rowLength: 5, startClear: 36, roofHeight: 3.6 };
 const SECTIONS = parseSections(`name: barrier
 . . .
 . L .
@@ -95,4 +95,33 @@ test('shipped sections are valid and plentiful', () => {
       assert.ok(row.some((c) => c.obstacle !== 'B'), `${s.name} row ${r} is blocked in all lanes`);
     });
   }
+});
+
+const ROOFTOP = parseSections(`name: rooftop
+. . .
+. B^ .
+. Bc .
+. Rc .
+. . .`);
+
+test('a ramp sits right in front of its train', () => {
+  const track = createTrack(ROOFTOP, opts, seeded());
+  track.fill(60);
+  const ramp = track.items.find((i) => i.kind === 'ramp');
+  const train = track.items.find((i) => i.kind === 'train');
+  assert.ok(ramp, 'ramp item exists');
+  assert.equal(ramp.lane, 1);
+  assert.equal(ramp.end - ramp.start, 5);
+  assert.equal(ramp.end, train.start);
+});
+
+test('coins on a roof or ramp sit on that surface', () => {
+  const track = createTrack(ROOFTOP, opts, seeded());
+  track.fill(60);
+  const coins = track.items.filter((i) => i.kind === 'coin' || i.kind === 'highcoin');
+  const [rampCoin, roofCoin, roofHigh] = coins;
+  assert.equal(rampCoin.base, 1.8, 'mid-ramp height');
+  assert.equal(roofCoin.base, 3.6);
+  assert.equal(roofHigh.kind, 'highcoin');
+  assert.equal(roofHigh.base, 3.6);
 });

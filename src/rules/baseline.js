@@ -16,6 +16,7 @@ export const BASELINE = {
   track: {
     rowLength: 5,         // TRK-1 metres per section-map line (our call)
     startClear: 36,       // CHS-2 empty track at run start until the intro leap exists (our call)
+    roofHeight: 3.6,      // TRK-5 🧪 train roof height; above jump reach so only ramps get you up (our call)
   },
   scoring: {
     pointsPerMetre: 14.6 / 12, // SCO-1 ≈14.6 points/s at x1 measured 2026-10-22, ÷ baseline run speed
