@@ -54,7 +54,7 @@ test('slider defaults come from the rules and match today\'s values', async () =
   const { RULES } = await import('../src/rules/index.js');
   assert.deepEqual(DEFAULTS, {
     runSpeed: 20, laneWidth: 2.5, laneSwitchTime: 0.12, jumpHeight: 2.2,
-    gravity: 45, slideTime: 0.6, fastFallSpeed: 30,
+    gravity: 36, slideTime: 0.6, fastFallSpeed: 30,
   });
   assert.notEqual(DEFAULTS, RULES.movement);
   assert.equal(Object.isFrozen(DEFAULTS), false, 'sliders need a mutable copy');

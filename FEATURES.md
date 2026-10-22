@@ -25,7 +25,7 @@ rough values are marked as such and stay 🧪 until confirmed.
 |---|---|---|---|---|---|
 | MOV-1 | Three lanes, endless forward run | Run forward automatically; swipe to dodge | — (WP) | ✅ | |
 | MOV-2 | Lane change | Swipe left/right; works mid-air and mid-switch | ≈ 0.15–0.2 s, rough (M, 2026-10-22) 🧪 | ✅ | |
-| MOV-3 | Jump | Swipe up | air time ≈ 0.7 s (M, 2026-10-22); height 🧪 | ✅ | |
+| MOV-3 | Jump | Swipe up | air time ≈ 0.7 s (M, 2026-10-22) → gravity 36; height 🧪 | ✅ | |
 | MOV-4 | Roll | Swipe down; mid-air swipe down drops fast into a roll | roll time 🧪 (M) | ✅ | |
 | MOV-5 | Run speed | Starts at a base speed | base speed 🧪 (M) | ✅ | Run speed 20 (by feel, 2026-10-18) |
 | MOV-6 | Speed ramp | Speed rises gradually during a run | curve & cap 🧪 (M) | ⬜ | |

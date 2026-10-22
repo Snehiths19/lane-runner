@@ -148,3 +148,11 @@ test('extreme tuning still lands and reaches the lane', () => {
   assert.equal(p.grounded, true);
   assert.ok(Math.abs(p.x - -2.5) < 1e-9);
 });
+
+test('baseline jump matches Subway Surfers air time (~0.7 s, measured 2026-10-22)', () => {
+  const p = createPlayer();
+  handleAction(p, 'jump', cfg);
+  let t = 0;
+  while (!p.grounded && t < 2) { updatePlayer(p, 1 / 240, cfg); t += 1 / 240; }
+  assert.ok(Math.abs(t - 0.7) < 0.02, `air time ${t.toFixed(3)} s`);
+});
