@@ -42,6 +42,16 @@ export const BASELINE = {
     sideLag: 0.12,        // CAM-1 🧪 seconds the camera takes to catch up sideways
     liftLag: 0.15,        // CAM-1 seconds the camera takes to catch up with a jump (our call)
   },
+  powerUps: {
+    magnet: {
+      duration: 10,       // PWR-1 🧪 seconds before upgrades (+5 s per upgrade, max 30 s per the wiki)
+      range: 15,          // PWR-1 metres ahead the magnet reaches (our call)
+      pullTime: 0.25,     // PWR-1 seconds a coin takes to fly in (our call)
+    },
+    double: {
+      duration: 10,       // PWR-4 🧪 seconds before upgrades (+5 s per upgrade, max 30 s per the wiki)
+    },
+  },
   chase: {
     stumbleTime: 3,       // HIT-3 🧪 seconds a stumble lasts (second bump inside it = crash)
     startTime: 2,         // CHS-1 🧪 seconds the chasers stay close at run start
