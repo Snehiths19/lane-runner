@@ -82,7 +82,7 @@ Points earned during a run: distance-based points times the score multiplier.
 _Avoid_: points
 
 **Score multiplier**:
-The number score is multiplied by; raised permanently by completing missions (up to x30), and temporarily by pickups and boosters.
+The number score is multiplied by; raised permanently by completing missions (up to x30), and temporarily by pickups and boosters (x1 until missions exist; doubled by the **2X multiplier**). Points add up as you run, so a 2X only doubles the points earned while it's active.
 
 **Coin**:
 A collectible on the track, also the currency spent on upgrades, hoverboards and items.
@@ -149,9 +149,6 @@ A power-up that pulls every coin within range ahead of the runner, in any lane a
 
 **2X multiplier**:
 A power-up that doubles the **score multiplier** while it runs (the HUD shows x2).
-
-**Score multiplier**:
-What the distance points are multiplied by (x1 until missions exist; doubled by the 2X power-up). Points add up as you run, so a 2X only doubles the points earned while it's active.
 
 **Friend event** (later):
 A friend appearing mid-run doing something, sometimes giving a **power-up**.
