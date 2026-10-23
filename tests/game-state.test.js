@@ -93,10 +93,19 @@ test('a tap on the crash screen starts a new, clean run', () => {
   assert.notEqual(g.runId, runId);
 });
 
-test('score is distance times points per metre times the multiplier, rounded down', () => {
+test('score is metres run times points per metre, rounded down', () => {
   const g = runningGame();
-  g.distance = 100;
+  advance(g, 10, 10);
   assert.equal(score(g, { scoring: { pointsPerMetre: 14.6 / 12 } }), 121);
+});
+
+test('a multiplier only counts for the metres run while it is on', () => {
+  const g = runningGame();
+  advance(g, 10, 10);       // 100 m at x1
+  advance(g, 5, 10, 2);     // 50 m at x2
+  advance(g, 5, 10);        // 50 m at x1
+  assert.equal(g.distance, 200);
+  assert.equal(score(g, { scoring: { pointsPerMetre: 1 } }), 100 + 100 + 50);
 });
 
 const ramp = { rampTime: 150, maxBoost: 0.6 };
