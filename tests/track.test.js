@@ -76,6 +76,16 @@ test('drops passed items', () => {
   assert.ok(track.items.every((i) => i.end >= 300));
 });
 
+test('keeps passed coins the magnet is still pulling in', () => {
+  const track = createTrack(SECTIONS, opts, seeded());
+  track.fill(500);
+  const coin = track.items.find((i) => i.kind === 'coin' && i.end < 300);
+  coin.pull = 0.5;
+  track.dropBefore(300);
+  assert.ok(track.items.includes(coin));
+  assert.ok(track.items.every((i) => i.end >= 300 || i.pull !== undefined));
+});
+
 test('reset clears items and starts again after the clear stretch', () => {
   const track = createTrack(SECTIONS, opts, seeded());
   track.fill(500);

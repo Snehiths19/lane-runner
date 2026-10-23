@@ -15,6 +15,7 @@ const TILE_COUNT = 8;
 const SKY = 0x8ec9ff;
 const BLOCK_COLORS = [0xd9a066, 0xc97b63, 0x9aa5b1, 0x7d8ca3, 0xe0c9a6];
 const RUNNER_HEIGHT = 1.6;
+const COIN_Y = 0.8; // a coin's height above its surface
 
 // Track pieces are built for lane width 1 and stretched sideways to the live laneWidth.
 function buildTrack(materials) {
@@ -222,7 +223,7 @@ function buildItemFactory() {
       body.add(plank);
     } else {
       const coin = new THREE.Mesh(coinGeo, m.coin);
-      coin.position.y = kind === 'highcoin' ? 2.5 : 0.8;
+      coin.position.y = kind === 'highcoin' ? 2.5 : COIN_Y;
       g.add(coin);
       g.userData.coin = coin;
     }
@@ -361,7 +362,9 @@ export function createWorld(canvas) {
       if (item.pull) {
         const t = item.pull * item.pull; // speeds up as it flies in
         mesh.position.x += (player.x - mesh.position.x) * t;
-        mesh.position.y += (player.y - mesh.position.y) * t;
+        // Aim the coin itself (raised inside its group, higher for a high coin) at the runner's middle.
+        const targetY = player.y + COIN_Y - mesh.userData.coin.position.y;
+        mesh.position.y += (targetY - mesh.position.y) * t;
         mesh.position.z += (0 - mesh.position.z) * t;
       }
       if (mesh.userData.coin) mesh.userData.coin.rotation.y = time * 3;

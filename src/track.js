@@ -89,8 +89,9 @@ export function createTrack(sections, { rowLength, startClear, roofHeight, train
   }
 
   // Forget items the runner has fully passed, so long runs don't grow without limit.
+  // Coins the magnet is pulling stay until they reach the runner, however far behind they fall.
   function dropBefore(distance) {
-    const keep = items.filter((i) => i.end >= distance);
+    const keep = items.filter((i) => i.end >= distance || i.pull !== undefined);
     items.splice(0, items.length, ...keep);
   }
 
