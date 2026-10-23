@@ -16,12 +16,15 @@ const width = (kind, cfg) => (isCoin(kind) ? 0.6 : kind === 'powerup' ? 0.8 : 0.
 
 const overlaps = (a0, a1, b0, b1) => a0 < b1 && b0 < a1;
 
+// What touching nothing looks like (also used while hits are off, e.g. the intro leap).
+export const noHits = () => ({ crash: false, sideBump: false, coins: [], powerUps: [] });
+
 // prevDistance: where the runner was last frame. An obstacle whose front reached the runner during
 // this frame is a head-on hit; one that was already alongside, touched while changing lanes, is a
 // side bump (CONTEXT.md). Unknown previous position counts as head-on.
 export function checkHits(player, items, distance, cfg, prevDistance = -Infinity) {
   const box = hitbox(player);
-  const result = { crash: false, sideBump: false, coins: [], powerUps: [] };
+  const result = noHits();
   const prevFront = prevDistance + RUNNER_DEPTH / 2;
   const switching = player.switchT < 1;
   for (const item of items) {

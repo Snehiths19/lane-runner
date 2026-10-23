@@ -9,16 +9,19 @@ import { buildPanel } from './panel.js';
 import { RULES } from './rules/index.js';
 import { parseSections } from './sections.js';
 import { createTrack } from './track.js';
-import { checkHits } from './hits.js';
+import { checkHits, noHits } from './hits.js';
 import { groundHeightAt } from './ground.js';
 import { loadRuns, recordRun } from './runs.js';
 import { createChase, updateChase, bump, startCatch } from './chase.js';
+import { createPowerUps, collect, tickPowerUps, timeLeft, scoreMultiplier, pullCoins, takeItems, isActive } from './powerups.js';
 
 const canvas = document.getElementById('game');
 const stage = document.getElementById('stage');
 const startScreen = document.getElementById('start');
 const scoreEl = document.getElementById('score');
 const coinsEl = document.getElementById('coins');
+const multEl = document.querySelector('#hud .mult');
+const powersEl = document.getElementById('powers');
 const crashScreen = document.getElementById('crash');
 const flash = document.getElementById('flash');
 const gear = document.getElementById('gear');
@@ -43,8 +46,9 @@ try {
 const game = createGame();
 let player = createPlayer();
 let chase = createChase(RULES.chase);
+let powerUps = createPowerUps();
 const world = createWorld(canvas);
-const track = createTrack(sections, RULES.track);
+const track = createTrack(sections, { ...RULES.track, powerUps: Object.keys(RULES.powerUps) });
 let runId = game.runId;
 let result = null; // this run's recorded score, best and top runs
 
@@ -75,6 +79,8 @@ crashScreen.addEventListener('click', () => onAction('jump'));
 function newRun() {
   player = createPlayer();
   chase = createChase(RULES.chase);
+  powerUps = createPowerUps();
+  window.__laneRunner.powerUps = powerUps;
   window.__laneRunner.player = player;
   window.__laneRunner.chase = chase;
   track.reset();
@@ -179,6 +185,8 @@ function frame(nowMs) {
   world.update(scroll, player, cfg, track.items, game.distance, now, groundY, dt, chase.gap);
   scoreEl.textContent = pad(score(game, RULES));
   coinsEl.textContent = String(game.coins);
+  multEl.textContent = `x${scoreMultiplier(powerUps)}`;
+  showPowerUps();
   requestAnimationFrame(frame);
 }
 
@@ -187,7 +195,7 @@ function runStep(dt, speed, now) {
   // Rules that need world sizes as well as the slider values.
   const worldCfg = { ...cfg, roofHeight: RULES.track.roofHeight };
   const prevDistance = game.distance;
-  const runDt = advance(game, dt, speed);
+  const runDt = advance(game, dt, speed, scoreMultiplier(powerUps));
   track.move(runDt);
   const groundY = groundHeightAt(player.x, game.distance, track.items, worldCfg, { y: player.y, prevDistance });
   updatePlayer(player, runDt, cfg, groundY);
@@ -195,20 +203,42 @@ function runStep(dt, speed, now) {
     track.fill(game.distance + 150, game.distance, speed);
     track.dropBefore(game.distance - 10);
     // Nothing can be hit during the intro leap.
-    const hits = player.intro ? { crash: false, sideBump: false, coins: [] }
+    const hits = player.intro ? noHits()
       : checkHits(player, track.items, game.distance, worldCfg, prevDistance);
     // Only a new bounce is a new bump: still touching the same train while heading back isn't.
     if (hits.sideBump && !hits.crash && bounceBack(player)) onBump(now);
-    if (hits.coins.length) {
-      game.coins += hits.coins.length;
-      const taken = new Set(hits.coins);
-      track.items.splice(0, track.items.length, ...track.items.filter((i) => !taken.has(i.id)));
-    }
+    // The magnet starts pulling coins only while it runs; coins already flying still arrive.
+    const magnet = RULES.powerUps.magnet;
+    const pulled = pullCoins(track.items, game.distance, runDt, isActive(powerUps, 'magnet') ? magnet : { ...magnet, range: -Infinity });
+    game.coins += takeItems(track.items, [...hits.coins, ...pulled]);
+    for (const id of hits.powerUps) collect(powerUps, track.items.find((i) => i.id === id).power, RULES.powerUps);
+    takeItems(track.items, hits.powerUps);
+    tickPowerUps(powerUps, runDt);
     if (hits.crash && game.state === 'running') onCrash(now);
   }
   return { scroll: speed * runDt, groundY };
 }
 
+// Running power-ups at the bottom left: an icon and a bar showing the time left.
+const POWER_ICONS = { magnet: '🧲', double: '2X' };
+function showPowerUps() {
+  const names = Object.keys(powerUps.active);
+  if (powersEl.dataset.names !== names.join()) {
+    powersEl.dataset.names = names.join();
+    powersEl.replaceChildren(...names.map((name) => {
+      const el = document.createElement('div');
+      el.className = 'power';
+      el.dataset.name = name;
+      el.innerHTML = `<span class="icon">${POWER_ICONS[name]}</span><span class="bar"><span></span></span>`;
+      return el;
+    }));
+  }
+  for (const el of powersEl.children) {
+    const share = timeLeft(powerUps, el.dataset.name) / RULES.powerUps[el.dataset.name].duration;
+    el.querySelector('.bar span').style.width = `${Math.max(0, share) * 100}%`;
+  }
+}
+
 // Exposed for browser checks during development.
-window.__laneRunner = { game, player, cfg, track, chase };
+window.__laneRunner = { game, player, cfg, track, chase, powerUps };
 requestAnimationFrame(frame);
