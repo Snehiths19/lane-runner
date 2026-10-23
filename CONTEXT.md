@@ -155,6 +155,7 @@ A friend appearing mid-run doing something, sometimes giving a **power-up**.
 
 - **Ground height comes from one place.** Landing and collisions always ask for the ground height under the runner (by lane and distance); it is 0 everywhere until **trains** (slice 2b) add roofs. Nothing may assume y = 0 directly.
 - **A ramp always leads onto a train**: it sits directly in front of a train in the same lane. A ramp leading nowhere is a mistake the checks reject.
+- **Switching two lanes between trains needs room**: at least 4 clear lines (20 m) between a train that leaves only one side open and the next that leaves only the other side, inside a section and across any join. The checks reject tighter spots (Snehith found the old zigzag unfair at speed 20, 2026-10-22).
 - **Every section starts and ends with all three lanes clear**, so any two sections can follow each other without creating an impossible spot.
 - **Placing is generic.** Whatever puts obstacles on the track must also be able to place coins and friend events.
 - **Hitbox is separate from image.** Collisions never use image size.

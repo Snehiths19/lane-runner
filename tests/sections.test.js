@@ -138,3 +138,72 @@ test('rejects anything in a moving train lane beyond it', () => {
 . M .
 . . .`), /blocked.*line 3.*moving train's lane must be empty/);
 });
+
+test('rejects a two-lane switch between trains without room to make it', () => {
+  // Trains in the middle and right, then 2 empty rows, then trains in the left and middle:
+  // from the left lane you must cross two lanes in 10 m.
+  assert.throws(() => parseSections(`name: tight
+. . .
+B B .
+. . .
+. . .
+. B B
+. . .`), /tight.*line 3.*two lanes/);
+});
+
+test('a two-lane switch with 4 clear rows is fine', () => {
+  assert.doesNotThrow(() => parseSections(`name: roomy
+. . .
+. . .
+B B .
+. . .
+. . .
+. . .
+. . .
+. B B
+. . .
+. . .`));
+});
+
+test('rejects two sections whose join forces a tight two-lane switch', () => {
+  assert.throws(() => parseSections(`name: endsleft
+. . .
+. B B
+. . .
+name: startsright
+. . .
+B B .
+. . .`), /endsleft.*startsright.*two lanes/);
+});
+
+test('rejects a layout with no way through past a long train', () => {
+  // Right lane open, then only the left: the middle train's side is in the way.
+  assert.throws(() => parseSections(`name: walled
+. . .
+. B B
+. B .
+B B .
+. . .`), /walled.*line 3.*no way through/);
+});
+
+test('a train with a ramp counts as a way through (over its roof)', () => {
+  assert.doesNotThrow(() => parseSections(`name: overtop
+. . .
+B B .
+B B .
+. R .
+. . .`));
+});
+
+test('a single section is checked against following itself', () => {
+  // Fine inside, but its far end (left and middle blocked) runs into its own near end (middle and right).
+  assert.throws(() => parseSections(`name: alone
+. . .
+B B .
+. . .
+. . .
+. . .
+. . .
+. B B
+. . .`), /alone.*alone.*two lanes/);
+});

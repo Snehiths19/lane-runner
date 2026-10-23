@@ -5,6 +5,7 @@
 
 const OBSTACLES = ['L', 'O', 'B', 'R', 'M']; // low barrier, overhead bar, train, ramp, moving train
 const COINS = ['c', '^'];          // coin, high coin
+const MIN_TWO_LANE_ROWS = 4;       // clear lines needed to switch two lanes between trains (our call)
 
 function parseCell(token, where) {
   const cell = { obstacle: null, coin: null };
@@ -61,11 +62,71 @@ export function parseSections(text) {
         }
       }
     }
+    // There must always be a way through: a runner can't cross a train's side to reach the only
+    // open lane. Trains with a ramp count as open, since their roof can be run on.
+    const stuck = noWayThrough(s);
+    if (stuck >= 0) throw new Error(`Section "${s.name}", line ${lines[stuck]}: no way through (trains block every lane you can reach)`);
+    // Switching across two lanes between trains needs room (our call, so it stays fair at full speed).
+    s.trainRows = trainRows(s);
+    for (let k = 1; k < s.trainRows.length; k++) {
+      const before = s.trainRows[k - 1];
+      const after = s.trainRows[k];
+      if (tooTight(before, after, after.r - before.r - 1)) {
+        throw new Error(`Section "${s.name}", line ${lines[after.r]}: switching two lanes between trains needs ${MIN_TWO_LANE_ROWS} clear lines`);
+      }
+    }
     // Any two sections must be able to follow each other (CONTEXT.md invariant).
     const clear = (row) => row.every((c) => !c.obstacle && !c.coin);
     if (!s.rows.length || !clear(s.rows[0]) || !clear(s.rows.at(-1))) {
       throw new Error(`Section "${s.name}": first and last rows must be clear`);
     }
   }
+  // The same goes where one section's last train meets the next section's first. A section only
+  // follows itself when it's the only one.
+  for (const a of sections) {
+    for (const b of sections) {
+      if ((a === b && sections.length > 1) || !a.trainRows.length || !b.trainRows.length) continue;
+      const gap = a.rows.length - 1 - a.trainRows.at(-1).r + b.trainRows[0].r;
+      if (tooTight(a.trainRows.at(-1), b.trainRows[0], gap)) {
+        throw new Error(`Sections "${a.name}" then "${b.name}": switching two lanes between trains needs ${MIN_TWO_LANE_ROWS} clear lines across the join`);
+      }
+    }
+  }
+  for (const s of sections) delete s.trainRows;
   return sections;
+}
+
+// The first row (index) where no lane the runner can reach is open, or -1 if there's always a way.
+// Sideways moves within a row only pass open lanes; a lane stays reachable while it stays open.
+function noWayThrough(section) {
+  const rampTrain = [false, false, false]; // the train now in each lane was reached by a ramp
+  let reach = [true, true, true];
+  for (let r = 0; r < section.rows.length; r++) {
+    const row = section.rows[r];
+    const open = row.map((cell, lane) => {
+      const train = cell.obstacle === 'B' || cell.obstacle === 'M';
+      if (!train) rampTrain[lane] = cell.obstacle === 'R';
+      return !train || rampTrain[lane];
+    });
+    const next = reach.map((ok, lane) => ok && open[lane]);
+    for (let pass = 0; pass < 2; pass++) {
+      for (let lane = 0; lane < 3; lane++) {
+        if (!next[lane] && open[lane] && (next[lane - 1] || next[lane + 1])) next[lane] = true;
+      }
+    }
+    if (!next.some(Boolean)) return r;
+    reach = next;
+  }
+  return -1;
+}
+
+// Rows with a train (B or M) in them, with the lanes left open.
+function trainRows(section) {
+  return section.rows.map((row, r) => ({ r, open: [0, 1, 2].filter((l) => !'BM'.includes(row[l].obstacle ?? '.')) }))
+    .filter(({ open }) => open.length < 3);
+}
+
+// Going from any open lane before to any open lane after means crossing two lanes, with too little room.
+function tooTight(before, after, gap) {
+  return gap < MIN_TWO_LANE_ROWS && before.open.every((a) => after.open.every((b) => Math.abs(a - b) >= 2));
 }
