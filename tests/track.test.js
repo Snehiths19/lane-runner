@@ -208,3 +208,20 @@ test('sections start only after the intro leap lands, even with slow tuning', ()
   const first = track.items.filter((i) => !i.speed)[0];
   assert.ok(first.start > airTime * 40, `first item at ${first.start}, landing at ${airTime * 40}`);
 });
+
+test('a power-up spot becomes a power-up of a random kind, on the surface of its cell', () => {
+  const [boost] = parseSections(`name: boost
+. . .
+. Bp .
+. R .
+p . .
+. . .`);
+  const track = createTrack([boost], { ...opts, powerUps: ['magnet', 'double'] }, seeded(3));
+  track.fill(400);
+  const ups = track.items.filter((i) => i.kind === 'powerup');
+  assert.ok(ups.length >= 4);
+  assert.ok(ups.every((u) => ['magnet', 'double'].includes(u.power)));
+  assert.ok(new Set(ups.map((u) => u.power)).size === 2, 'both kinds turn up');
+  assert.ok(ups.some((u) => u.base === opts.roofHeight), 'one on the roof');
+  assert.ok(ups.some((u) => u.base === 0), 'one on the track');
+});

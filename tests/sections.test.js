@@ -207,3 +207,14 @@ B B .
 . B B
 . . .`), /alone.*alone.*two lanes/);
 });
+
+test('p is a power-up spot, like a coin; it can sit on a roof', () => {
+  const [s] = parseSections(`name: boost
+. . .
+. Bp .
+. R .
+p . .
+. . .`);
+  assert.equal(s.rows[1][0].coin, 'p');
+  assert.deepEqual(s.rows[3][1], { obstacle: 'B', coin: 'p' });
+});
