@@ -141,6 +141,18 @@ A coin at jump height above whatever is under it (track or roof), reached only b
 **Roof coin**:
 A coin on a train's roof (written `Bc` in a section map), reached by running up the train's ramp.
 
+**Power-up**:
+A pickup on the track (written `p` in a section map, like a coin) that gives the runner a timed ability. Which power-up a `p` becomes is picked at random when the track is built. Picking up one that's already running restarts its timer. All power-ups end with the run.
+
+**Coin magnet**:
+A power-up that pulls every coin within range ahead of the runner, in any lane and at any height, into the runner.
+
+**2X multiplier**:
+A power-up that doubles the **score multiplier** while it runs (the HUD shows x2).
+
+**Score multiplier**:
+What the distance points are multiplied by (x1 until missions exist; doubled by the 2X power-up). Points add up as you run, so a 2X only doubles the points earned while it's active.
+
 **Friend event** (later):
 A friend appearing mid-run doing something, sometimes giving a **power-up**.
 

@@ -18,8 +18,10 @@ _Last updated: 2026-10-22._
 | M2 · 2a | Dodge & crash: sections, obstacles, coins, crash, score, crash card, top runs | ✅ accepted |
 | M2 · 2b | Trains: ramps, roofs, roof coins, roof hopping, side-bump bounce, surface camera | ✅ accepted |
 | M2 · 2c | Chase: stumble, inspector & dog, edge-swipe stumble | ✅ accepted |
-| M2 · 2d | Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera | ✅ built, awaiting Snehith's check |
-| **M3** | **Power-ups** | **⏭ next** |
+| M2 · 2d | Alive world: moving trains, tunnels, speed ramp, intro leap, jump/sideways camera | ✅ accepted |
+| **M3 · 3a** | **Power-ups: pickups, coin magnet, 2X multiplier, timers** | **🔨 building** |
+| M3 · 3b | Super sneakers, jetpack, timer overlap | ⬜ |
+| M3 · 3c | Pogo stick, mystery box | ⬜ |
 | M3–M6 | Power-ups → hoverboard/keys/revive → progression/shop → events/world | ⬜ |
 | Personal | Music, Snehith's face, friend events, San Jose | ⬜ |
 
@@ -60,7 +62,7 @@ Snehith's acceptance check: (1) the inspector and dog are there at the start and
 ends the run and they grab you; (4) swiping into the wall at the edge counts as a bump; (5) it still
 feels fair on phone and PC.
 
-## Just built: slice 2d, the alive world
+## Done: slice 2d, the alive world (accepted 2026-10-23: "looks good to me", after playtest fixes: two-lane switches need 4 clear lines, a third moving-train section, no-way-through check)
 
 Spec `docs/superpowers/specs/2026-10-22-m2d-alive-world-design.md`, plan
 `docs/superpowers/plans/2026-10-22-m2d-alive-world.md`. Moving trains (`M` in sections, `track.move`),

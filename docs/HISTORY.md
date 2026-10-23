@@ -100,6 +100,10 @@ HUD (score + x1 top-right, ⚙️ top-left), hit flash, crash card after ~1 s, b
   runner past a train's front, and the ground rule lifted them onto the roof instead of a crash. Fixed
   in `groundHeightAt` (a roof counts only once you're up there or arrive from the ramp or roof you stood on).
 - Publishing now waits for his go-ahead on the pull request (merging without review was blocked).
+- Playtest (10-22): no oncoming trains seen (most likely the cached old version; a third moving-train
+  section added anyway) and an unfair two-lane switch in `zigzag` (10 m at speed 20). Fixed with a
+  section check: 4 clear lines for a two-lane switch, also across joins; plus a no-way-through check.
+  Accepted 10-23: "looks good to me".
 
 ## Ideas parked for later
 
