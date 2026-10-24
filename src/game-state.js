@@ -2,11 +2,11 @@
 // Movement and world time only advance while running.
 
 export function createGame() {
-  return { state: 'start', distance: 0, time: 0, coins: 0, runId: 1, crashedAt: null, crashScreenShown: false };
+  return { state: 'start', distance: 0, points: 0, time: 0, coins: 0, runId: 1, crashedAt: null, crashScreenShown: false };
 }
 
 function startNewRun(g) {
-  Object.assign(g, { state: 'running', distance: 0, time: 0, coins: 0, runId: g.runId + 1, crashedAt: null, crashScreenShown: false });
+  Object.assign(g, { state: 'running', distance: 0, points: 0, time: 0, coins: 0, runId: g.runId + 1, crashedAt: null, crashScreenShown: false });
 }
 
 // Returns the action the runner should perform, or null if it should be ignored.
@@ -30,9 +30,11 @@ export function setPaused(g, paused) {
 }
 
 // Moves the world forward; returns how much time actually passed for the runner.
-export function advance(g, dt, speed) {
+// multiplier: the score multiplier right now (CONTEXT.md); points add up metre by metre.
+export function advance(g, dt, speed, multiplier = 1) {
   if (g.state !== 'running') return 0;
   g.distance += speed * dt;
+  g.points += speed * dt * multiplier;
   g.time += dt;
   return dt;
 }
@@ -66,7 +68,7 @@ export function crashScreenReady(g, now, delay) {
   return g.crashScreenShown;
 }
 
-// Subway-style score: distance-based points times the score multiplier (x1 until missions exist).
-export function score(g, rules, multiplier = 1) {
-  return Math.floor(g.distance * rules.scoring.pointsPerMetre * multiplier);
+// Subway-style score: metres run, each times the score multiplier at that moment, in points.
+export function score(g, rules) {
+  return Math.floor(g.points * rules.scoring.pointsPerMetre);
 }

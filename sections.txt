@@ -11,6 +11,7 @@
 #   M   moving train: drives toward you (stacked M's = one long moving train). Never has a ramp,
 #       and nothing may sit in its lane above it in the same section.
 #   Bc  coin on a train roof     B^  high coin above a roof     Rc  coin on a ramp
+#   p   power-up (which one is random); Bp = power-up on a roof
 #
 # Rules (the tests check these): every section starts and ends with an empty line, every line
 # has exactly 3 cells, a ramp always has a train right above it, no line blocks all three lanes with B,
@@ -53,7 +54,7 @@ c . .
 c . .
 c L .
 c . .
-c . .
+c . p
 . . .
 
 name: hurdles
@@ -72,7 +73,7 @@ name: gates
 . . .
 O O O
 . . .
-. . .
+. p .
 c c c
 . . .
 . . .
@@ -101,7 +102,7 @@ name: rampup
 . . .
 . . .
 . Bc .
-. Bc .
+. Bp .
 . Bc .
 . Bc .
 . Rc .
@@ -126,7 +127,7 @@ c B .
 c B .
 c B .
 . B c
-. B c
+. B p
 . . .
 . . .
 
@@ -148,7 +149,7 @@ c M .
 c M .
 c M .
 c . .
-c . .
+p . .
 . . .
 
 name: rush

@@ -4,7 +4,7 @@
 // Mistakes throw with the section name and line number, so a typo can't slip into the game.
 
 const OBSTACLES = ['L', 'O', 'B', 'R', 'M']; // low barrier, overhead bar, train, ramp, moving train
-const COINS = ['c', '^'];          // coin, high coin
+const COINS = ['c', '^', 'p'];     // coin, high coin, power-up spot
 const MIN_TWO_LANE_ROWS = 4;       // clear lines needed to switch two lanes between trains (our call)
 
 function parseCell(token, where) {

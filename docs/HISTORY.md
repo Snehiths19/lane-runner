@@ -100,6 +100,19 @@ HUD (score + x1 top-right, ⚙️ top-left), hit flash, crash card after ~1 s, b
   runner past a train's front, and the ground rule lifted them onto the roof instead of a crash. Fixed
   in `groundHeightAt` (a roof counts only once you're up there or arrive from the ramp or roof you stood on).
 - Publishing now waits for his go-ahead on the pull request (merging without review was blocked).
+- Playtest (10-22): no oncoming trains seen (most likely the cached old version; a third moving-train
+  section added anyway) and an unfair two-lane switch in `zigzag` (10 m at speed 20). Fixed with a
+  section check: 4 clear lines for a two-lane switch, also across joins; plus a no-way-through check.
+  Accepted 10-23: "looks good to me".
+
+### Slice 3a · power-ups part 1 (recommendations taken, built 10-23)
+- M3 split into 3a (magnet + 2X), 3b (sneakers, jetpack, timer overlap), 3c (pogo, mystery box).
+- Recommendations taken: power-ups sit at `p` spots in sections, kind picked at random; each lasts
+  10 s 🧪 until upgrades exist; magnet pulls every coin within 15 m ahead in any lane and height;
+  2X doubles the score multiplier (HUD x2); running power-ups show as icons with shrinking bars at the
+  bottom left; picking up a running one restarts its timer.
+- Browser check found the intro leap's stand-in "no hits" result was missing the new power-up list,
+  which broke the loop; fixed by one shared `noHits()` in `hits.js`.
 
 ## Ideas parked for later
 

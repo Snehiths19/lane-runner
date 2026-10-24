@@ -30,7 +30,8 @@ and makes gameplay/design decisions. Present those decisions as plain-language c
 - Track & run (pure, tested): `src/sections.js` (parse/validate section maps), `src/track.js` (chain
   sections into items by distance), `src/hits.js` (hitbox overlaps → crash / side bump / coins; trains solid up to just
   under the roof), `src/ground.js` (the only source of ground height: roofs and ramps), `src/runs.js` (best score + top runs, key `lane-runner.runs`),
-  `src/chase.js` (stumble, chasers' gap, catch), `src/tunnels.js` (where tunnels are).
+  `src/chase.js` (stumble, chasers' gap, catch), `src/tunnels.js` (where tunnels are),
+  `src/powerups.js` (power-up timers, score multiplier, magnet pull).
 - `sections.txt` (repo root): the hand-made sections. Snehith may edit it; the tests and the page both
   reject mistakes with the section name and line.
 - Browser-only, verified by playing: `src/world.js` (Three.js scene + item models), `src/panel.js`,

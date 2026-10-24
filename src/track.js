@@ -3,10 +3,11 @@
 // base is the height of the surface it sits on (0 = track; roof or ramp for raised coins).
 // A moving train also has speed (metres per second toward the runner) and prevStart (last frame's front).
 
-const KIND = { L: 'low', O: 'over', B: 'train', c: 'coin', '^': 'highcoin' };
-const DEPTH = { low: 0.4, over: 0.4, coin: 0.6, highcoin: 0.6 };
+const KIND = { L: 'low', O: 'over', B: 'train', c: 'coin', '^': 'highcoin', p: 'powerup' };
+const DEPTH = { low: 0.4, over: 0.4, coin: 0.6, highcoin: 0.6, powerup: 0.8 };
 
-export function createTrack(sections, { rowLength, startClear, roofHeight, trainSpeed = 0 }, random = Math.random) {
+// powerUps: the power-up kinds a `p` spot can become (picked at random).
+export function createTrack(sections, { rowLength, startClear, roofHeight, trainSpeed = 0, powerUps = ['magnet'] }, random = Math.random) {
   const items = [];
   let nextStart = startClear;
   let nextId = 1;
@@ -38,7 +39,9 @@ export function createTrack(sections, { rowLength, startClear, roofHeight, train
           const half = DEPTH[kind] / 2;
           // Coins ride on the surface of their cell: a train roof, or halfway up a ramp.
           const base = cell.obstacle === 'B' ? roofHeight : cell.obstacle === 'R' ? roofHeight / 2 : 0;
-          added.push({ id: nextId++, kind, lane, start: centre - half, end: centre + half, base });
+          const item = { id: nextId++, kind, lane, start: centre - half, end: centre + half, base };
+          if (kind === 'powerup') item.power = powerUps[Math.floor(random() * powerUps.length)];
+          added.push(item);
         }
       });
     });
@@ -86,8 +89,9 @@ export function createTrack(sections, { rowLength, startClear, roofHeight, train
   }
 
   // Forget items the runner has fully passed, so long runs don't grow without limit.
+  // Coins the magnet is pulling stay until they reach the runner, however far behind they fall.
   function dropBefore(distance) {
-    const keep = items.filter((i) => i.end >= distance);
+    const keep = items.filter((i) => i.end >= distance || i.pull !== undefined);
     items.splice(0, items.length, ...keep);
   }
 

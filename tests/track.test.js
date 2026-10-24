@@ -76,6 +76,16 @@ test('drops passed items', () => {
   assert.ok(track.items.every((i) => i.end >= 300));
 });
 
+test('keeps passed coins the magnet is still pulling in', () => {
+  const track = createTrack(SECTIONS, opts, seeded());
+  track.fill(500);
+  const coin = track.items.find((i) => i.kind === 'coin' && i.end < 300);
+  coin.pull = 0.5;
+  track.dropBefore(300);
+  assert.ok(track.items.includes(coin));
+  assert.ok(track.items.every((i) => i.end >= 300 || i.pull !== undefined));
+});
+
 test('reset clears items and starts again after the clear stretch', () => {
   const track = createTrack(SECTIONS, opts, seeded());
   track.fill(500);
@@ -207,4 +217,21 @@ test('sections start only after the intro leap lands, even with slow tuning', ()
   const airTime = 2 * Math.sqrt(2 * 5 / 10);
   const first = track.items.filter((i) => !i.speed)[0];
   assert.ok(first.start > airTime * 40, `first item at ${first.start}, landing at ${airTime * 40}`);
+});
+
+test('a power-up spot becomes a power-up of a random kind, on the surface of its cell', () => {
+  const [boost] = parseSections(`name: boost
+. . .
+. Bp .
+. R .
+p . .
+. . .`);
+  const track = createTrack([boost], { ...opts, powerUps: ['magnet', 'double'] }, seeded(3));
+  track.fill(400);
+  const ups = track.items.filter((i) => i.kind === 'powerup');
+  assert.ok(ups.length >= 4);
+  assert.ok(ups.every((u) => ['magnet', 'double'].includes(u.power)));
+  assert.ok(new Set(ups.map((u) => u.power)).size === 2, 'both kinds turn up');
+  assert.ok(ups.some((u) => u.base === opts.roofHeight), 'one on the roof');
+  assert.ok(ups.some((u) => u.base === 0), 'one on the track');
 });

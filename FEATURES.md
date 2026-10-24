@@ -63,10 +63,10 @@ CHS-2, CAM-1). Revive waits for keys in M4.
 
 | ID | Feature | Baseline | Numbers (source) | Status | Your tweak |
 |---|---|---|---|---|---|
-| PWR-1 | Coin magnet | Pulls nearby coins to you | base 🧪; +5 s per upgrade; max 30 s (W) | ⬜ | |
+| PWR-1 | Coin magnet | Pulls nearby coins to you | base 10 s 🧪; +5 s per upgrade; max 30 s (W); pulls coins within 15 m ahead, any lane | ✅ 3a | |
 | PWR-2 | Jetpack | Fly above the track collecting a coin trail, then land | base 🧪; +5 s per upgrade; max 25 s (W) | ⬜ | |
 | PWR-3 | Super sneakers | Much higher jumps (onto trains from the ground) | base 🧪; +5 s per upgrade; max 30 s (W) | ⬜ | |
-| PWR-4 | 2X multiplier | Doubles the score rate while active | base 🧪; +5 s per upgrade; max 30 s (W, H) | ⬜ | |
+| PWR-4 | 2X multiplier | Doubles the score rate while active | base 10 s 🧪; +5 s per upgrade; max 30 s (W, H) | ✅ 3a | |
 | PWR-5 | Pogo stick | Launches you high into the air; not upgradable | duration 🧪 (W) | ⬜ | |
 | PWR-6 | Timer overlap | Collecting a jetpack pauses the sneakers timer until the jetpack ends | — (W) | ⬜ | |
 | PWR-7 | Mystery box (pickup) | Collected on track; opened after the run for a random prize | prize odds 🧪 | ⬜ | |

@@ -15,6 +15,7 @@ const TILE_COUNT = 8;
 const SKY = 0x8ec9ff;
 const BLOCK_COLORS = [0xd9a066, 0xc97b63, 0x9aa5b1, 0x7d8ca3, 0xe0c9a6];
 const RUNNER_HEIGHT = 1.6;
+const COIN_Y = 0.8; // a coin's height above its surface
 
 // Track pieces are built for lane width 1 and stretched sideways to the live laneWidth.
 function buildTrack(materials) {
@@ -156,7 +157,34 @@ function buildItemFactory() {
   const coinGeo = new THREE.CylinderGeometry(0.3, 0.3, 0.08, 20);
   coinGeo.rotateX(Math.PI / 2);
 
-  // kind: an item kind, or 'movingTrain' for a train with speed (a different colour and headlights).
+  // Power-up pickups: a round badge with the power-up's icon, spinning like a coin.
+  const BADGES = { magnet: ['#d62828', '🧲'], double: ['#2a9d4b', '2X'] };
+  const badgeMats = {};
+  function badgeMaterial(power) {
+    if (!badgeMats[power]) {
+      const [colour, icon] = BADGES[power];
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const g = c.getContext('2d');
+      g.fillStyle = colour;
+      g.strokeStyle = '#ffffff';
+      g.lineWidth = 10;
+      g.beginPath(); g.arc(64, 64, 56, 0, Math.PI * 2); g.fill(); g.stroke();
+      g.fillStyle = '#ffffff';
+      g.font = 'bold 56px sans-serif';
+      g.textAlign = 'center';
+      g.textBaseline = 'middle';
+      g.fillText(icon, 64, 68);
+      const t = new THREE.CanvasTexture(c);
+      t.colorSpace = THREE.SRGBColorSpace;
+      badgeMats[power] = new THREE.MeshBasicMaterial({ map: t, transparent: true, alphaTest: 0.1, side: THREE.DoubleSide });
+    }
+    return badgeMats[power];
+  }
+  const badgeGeo = new THREE.PlaneGeometry(0.8, 0.8);
+
+  // kind: an item kind, 'movingTrain' for a train with speed (a different colour and headlights), or
+  // 'powerup:<name>' for a power-up pickup.
   return function build(kind) {
     const g = new THREE.Group();
     const body = new THREE.Group(); // stretched to lane width
@@ -182,6 +210,11 @@ function buildItemFactory() {
         body.add(lights);
         g.userData.lights = lights;
       }
+    } else if (kind.startsWith('powerup:')) {
+      const badge = new THREE.Mesh(badgeGeo, badgeMaterial(kind.slice(8)));
+      badge.position.y = 0.9;
+      g.add(badge);
+      g.userData.coin = badge; // spins like a coin
     } else if (kind === 'ramp') {
       // A plank rising from the track (near end) to the roof (far end).
       const slope = Math.atan2(ROOF, RAMP_LENGTH);
@@ -190,7 +223,7 @@ function buildItemFactory() {
       body.add(plank);
     } else {
       const coin = new THREE.Mesh(coinGeo, m.coin);
-      coin.position.y = kind === 'highcoin' ? 2.5 : 0.8;
+      coin.position.y = kind === 'highcoin' ? 2.5 : COIN_Y;
       g.add(coin);
       g.userData.coin = coin;
     }
@@ -307,13 +340,14 @@ export function createWorld(canvas) {
   scene.add(itemLayer);
 
   // Shows the track items (obstacles, coins) at their place relative to the runner's distance.
-  function syncItems(items, distance, cfg, time) {
+  // A coin the magnet is pulling (item.pull 0 → 1) flies from its place to the runner.
+  function syncItems(items, distance, cfg, time, player) {
     const live = new Set();
     for (const item of items) {
       live.add(item.id);
       let mesh = itemMeshes.get(item.id);
       if (!mesh) {
-        mesh = buildItem(item.speed ? 'movingTrain' : item.kind);
+        mesh = buildItem(item.speed ? 'movingTrain' : item.kind === 'powerup' ? `powerup:${item.power}` : item.kind);
         if (item.kind === 'train') mesh.userData.body.scale.z = item.end - item.start;
         // Undo the body's stretch so the headlights stay small, and put them on the front face.
         if (mesh.userData.lights) {
@@ -325,6 +359,14 @@ export function createWorld(canvas) {
       }
       mesh.userData.body.scale.x = cfg.laneWidth;
       mesh.position.set(laneX(item.lane, cfg), item.base ?? 0, -((item.start + item.end) / 2 - distance));
+      if (item.pull) {
+        const t = item.pull * item.pull; // speeds up as it flies in
+        mesh.position.x += (player.x - mesh.position.x) * t;
+        // Aim the coin itself (raised inside its group, higher for a high coin) at the runner's middle.
+        const targetY = player.y + COIN_Y - mesh.userData.coin.position.y;
+        mesh.position.y += (targetY - mesh.position.y) * t;
+        mesh.position.z += (0 - mesh.position.z) * t;
+      }
       if (mesh.userData.coin) mesh.userData.coin.rotation.y = time * 3;
     }
     for (const [id, mesh] of itemMeshes) {
@@ -346,7 +388,7 @@ export function createWorld(canvas) {
   const cam = { x: 0, lift: 0 }; // camera follow (CAM-1): sideways lag and jump lift
   function update(scroll, player, cfg, items = [], distance = 0, time = 0, groundY = 0, dt = 0, chaseGap = Infinity) {
     cameraSurface += (groundY - cameraSurface) * Math.min(1, dt / 0.25 * 3);
-    syncItems(items, distance, cfg, time);
+    syncItems(items, distance, cfg, time, player);
     syncTunnels(distance, cfg.laneWidth);
     if (cfg.laneWidth !== laneWidth) {
       laneWidth = cfg.laneWidth;
